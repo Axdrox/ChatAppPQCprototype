@@ -1,20 +1,95 @@
+//import 'react-native-gesture-handler'; //StackAPI
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import * as SplashScreen from 'expo-splash-screen';
+import { useCallback, useEffect, useState } from 'react';
+import * as Font from 'expo-font'
+import { NavigationContainer } from '@react-navigation/native';
+//import { createStackNavigator } from '@react-navigation/stack'; //StackAPI
+import { createNativeStackNavigator } from '@react-navigation/native-stack'; //Stack-NATIVE-API
+
+//Locales
+import ListaChats from './pantallas/ListaChats';
+
+
+SplashScreen.preventAutoHideAsync();
+//const Stack = createStackNavigator();//StackAPI
+const Stack = createNativeStackNavigator();
 
 export default function App() {
+  const [appIsLoaded, setAppIsLoaded] = useState(false);
+
+  useEffect(() => {
+
+    const prepare = async () => {
+      try {
+        await Font.loadAsync({
+          'black': require("./assets/fonts/Raleway/Raleway-Black.ttf"),
+          'blackItalic': require("./assets/fonts/Raleway/Raleway-BlackItalic.ttf"),
+          'bold': require("./assets/fonts/Raleway/Raleway-Bold.ttf"),
+          'boldItalic': require("./assets/fonts/Raleway/Raleway-BoldItalic.ttf"),
+          'extraBold': require("./assets/fonts/Raleway/Raleway-ExtraBold.ttf"),
+          'extraBoldItalic': require("./assets/fonts/Raleway/Raleway-ExtraBoldItalic.ttf"),
+          'extraLight': require("./assets/fonts/Raleway/Raleway-ExtraLight.ttf"),
+          'extraLightItalic': require("./assets/fonts/Raleway/Raleway-ExtraLightItalic.ttf"),
+          'italic': require("./assets/fonts/Raleway/Raleway-Italic.ttf"),
+          'light': require("./assets/fonts/Raleway/Raleway-Light.ttf"),
+          'lightItalic': require("./assets/fonts/Raleway/Raleway-LightItalic.ttf"),
+          'medium': require("./assets/fonts/Raleway/Raleway-Medium.ttf"),
+          'mediumItalic': require("./assets/fonts/Raleway/Raleway-MediumItalic.ttf"),
+          'regular': require("./assets/fonts/Raleway/Raleway-Regular.ttf"),
+          'semiBold': require("./assets/fonts/Raleway/Raleway-SemiBold.ttf"),
+          'semiBoldItalic': require("./assets/fonts/Raleway/Raleway-SemiBoldItalic.ttf"),
+          'thin': require("./assets/fonts/Raleway/Raleway-Thin.ttf"),
+          'thinItalic': require("./assets/fonts/Raleway/Raleway-ThinItalic.ttf"),
+        });
+      }
+      catch (error) {
+        console.log.error();
+      }
+      finally {
+        setAppIsLoaded(true);
+      }
+    };
+
+    prepare();
+
+  }, [])
+
+  //Corre cada vez que cambia el layout
+  const onLayout = useCallback(async () => {
+    if (appIsLoaded) {
+      await SplashScreen.hideAsync();
+    }
+  }, [appIsLoaded])
+
+  if (!appIsLoaded) {
+    return null;
+  }
+
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <SafeAreaProvider style={styles.container} onLayout={onLayout}>
+        <NavigationContainer>
+
+          <Stack.Navigator>
+            <Stack.Screen name="Home" component={ListaChats} />
+          </Stack.Navigator>
+
+
+        </NavigationContainer>
+    </SafeAreaProvider>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: '#fff'
   },
+  label: {
+    color: 'black',
+    fontSize: 18,
+    fontFamily: "regular"
+  }
 });
