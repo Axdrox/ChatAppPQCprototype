@@ -5,17 +5,9 @@ import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import * as SplashScreen from 'expo-splash-screen';
 import { useCallback, useEffect, useState } from 'react';
 import * as Font from 'expo-font'
-import { NavigationContainer } from '@react-navigation/native';
-//import { createStackNavigator } from '@react-navigation/stack'; //StackAPI
-import { createNativeStackNavigator } from '@react-navigation/native-stack'; //Stack-NATIVE-API
-
-//Locales
-import ListaChats from './pantallas/ListaChats';
-
+import Navegador from './navegacion/Navegador';
 
 SplashScreen.preventAutoHideAsync();
-//const Stack = createStackNavigator();//StackAPI
-const Stack = createNativeStackNavigator();
 
 export default function App() {
   const [appIsLoaded, setAppIsLoaded] = useState(false);
@@ -70,14 +62,7 @@ export default function App() {
 
   return (
     <SafeAreaProvider style={styles.container} onLayout={onLayout}>
-        <NavigationContainer>
-
-          <Stack.Navigator>
-            <Stack.Screen name="Home" component={ListaChats} />
-          </Stack.Navigator>
-
-
-        </NavigationContainer>
+      <Navegador/>
     </SafeAreaProvider>
   );
 }

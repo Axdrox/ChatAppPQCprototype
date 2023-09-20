@@ -1,9 +1,9 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
-const ListaChats = props => {
+const ConfiguracionPerfil = props => {
     return <View style={styles.container}>
-        <Text>Pantalla de Lista de Chats</Text>
+        <Text>Pantalla de configuracion de perfil de usuario</Text>
     </View>
 };
 
@@ -15,4 +15,4 @@ const styles=StyleSheet.create({
     }
 })
 
-export default ListaChats;
+export default ConfiguracionPerfil;
