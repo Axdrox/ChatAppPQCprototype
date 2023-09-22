@@ -16,6 +16,7 @@ import ConfiguracionPerfil from '../pantallas/ConfiguracionPerfil';
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
+//Navegador de pestañas inferiores
 const TabNavigator = () => {
     return (
         <Tab.Navigator screenOptions={{
@@ -27,7 +28,7 @@ const TabNavigator = () => {
                     <Entypo name="chat" size={size} color={color} />
                 )
             }} />
-            <Tab.Screen name="Configuracion" component={ConfiguracionPerfil} options={{
+            <Tab.Screen name="ConfiguracionPerfil" component={ConfiguracionPerfil} options={{
                 tabBarLabel: 'Configurar Perfil',
                 tabBarIcon: ({ color, size }) => (
                     <FontAwesome name="gear" size={size} color={color} />
@@ -44,7 +45,7 @@ const NavegadorPrincipal = props => {
                 headerShown: false
             }} />
             <Stack.Screen name="Conversacion" component={Conversacion} options={{
-                headerTitle: "Conversación"
+                headerTitle: ""
             }} />
         </Stack.Navigator>
     );
