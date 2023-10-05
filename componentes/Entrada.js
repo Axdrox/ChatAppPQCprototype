@@ -3,6 +3,12 @@ import { StyleSheet, Text, TextInput, View } from "react-native"
 import colores from "../constantes/colores";
 
 const Entrada = props => {
+
+    const onChangeText = texo => {
+        props.cambioEntrada(props.id, texo);
+    }
+
+
     return <View style={styles.contenedor}>
 
         <Text style={styles.etiqueta}>{props.etiqueta}</Text>
@@ -15,14 +21,16 @@ const Entrada = props => {
                     style={styles.icono} />
             }
             <TextInput
-                style={styles.entrada} />
+                {...props}
+                style={styles.entrada}
+                onChangeText={onChangeText} />
         </View>
 
         {
             //Mostrar mensaje de error en caso de que exista
             props.errorTexto &&
             <View style={styles.errorContenedor}>
-                <Text style={styles.errorTexto}>{props.errorTexto}</Text>
+                <Text style={styles.errorTexto}>{props.errorTexto[0]}</Text>
             </View>
         }
     </View>
