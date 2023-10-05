@@ -31,7 +31,6 @@ export const validarNombreUsuario = (id, valor) => {
             }
     }
     const resuladoValidacion = validate({ [id]: valor }, { [id]: restricciones });
-    console.log(validate({ [id]: valor }, { [id]: restricciones }));
     return resuladoValidacion && resuladoValidacion[id];
 }
 

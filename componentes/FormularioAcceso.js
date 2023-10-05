@@ -11,6 +11,10 @@ import { reducer } from "../utils/reductores/formulario";
 const FormularioAcceso = props => {
 
     const initialState = {
+        valoresEntrada:{
+            correo: "",
+            contrasenia: "",
+        },
         validacionesEntrada: {
             correo: false,
         },
@@ -21,7 +25,7 @@ const FormularioAcceso = props => {
 
     const controladorCambiosEntrada = useCallback((idEntrada, valorEntrada) => {
         const resultado = validarEntrada(idEntrada, valorEntrada);
-        dispatchFormState({ idEntrada, resultadoValidacion: resultado })
+        dispatchFormState({ idEntrada, resultadoValidacion: resultado, valorEntrada })
     }, [dispatchFormState])
 
     return (

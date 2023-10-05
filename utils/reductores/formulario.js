@@ -1,5 +1,5 @@
 export const reducer = (state, action) => {
-    const { resultadoValidacion, idEntrada } = action;
+    const { resultadoValidacion, idEntrada, valorEntrada } = action;
 
     /*
         Obtiene las validaciones actuales y actualiza 
@@ -8,7 +8,12 @@ export const reducer = (state, action) => {
     const validacionesActualizadas = {
         ...state.validacionesEntrada,
         [idEntrada]: resultadoValidacion
-    }
+    };
+
+    const valoresActualizados = {
+        ...state.valoresEntrada,
+        [idEntrada]: valorEntrada
+    };
 
     let formularioActualizadoValido = true;
 
@@ -25,6 +30,7 @@ export const reducer = (state, action) => {
     }
 
     return{
+        valoresEntrada: valoresActualizados,
         validacionesEntrada: validacionesActualizadas, 
         formularioValido: formularioActualizadoValido
     }

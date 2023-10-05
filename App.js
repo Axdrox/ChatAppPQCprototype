@@ -1,11 +1,13 @@
 //import 'react-native-gesture-handler'; //StackAPI
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { LogBox, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import * as SplashScreen from 'expo-splash-screen';
 import { useCallback, useEffect, useState } from 'react';
 import * as Font from 'expo-font'
 import Navegador from './navegacion/Navegador';
+
+//LogBox.ignoreLogs(['AsyncStorage has been stracted']);
 
 SplashScreen.preventAutoHideAsync();
 

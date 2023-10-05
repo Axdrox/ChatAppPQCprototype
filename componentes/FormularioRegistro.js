@@ -1,4 +1,4 @@
-import React, { useCallback, useReducer } from "react";
+import React, { useCallback, useEffect, useReducer, useState } from "react";
 import { FontAwesome } from '@expo/vector-icons';
 import { Entypo } from '@expo/vector-icons';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -8,8 +8,17 @@ import Entrada from '../componentes/Entrada';
 import BotonEnviar from '../componentes/BotonEnviar';
 import { validarEntrada } from "../utils/acciones/formulario";
 import { reducer } from "../utils/reductores/formulario";
+import { registrar } from "../utils/acciones/autenticacion";
+import { Alert } from "react-native";
 
 const initialState = {
+    valoresEntrada: {
+        nombreUsuario: "",
+        nombre: "",
+        apellido: "",
+        correo: "",
+        contrasenia: "",
+    },
     validacionesEntrada: {
         nombreUsuario: false,
         nombre: false,
@@ -32,12 +41,37 @@ const FormularioRegistro = props => {
             cambioEntrada={controladorCambiosEntrada} />
     */
 
+    const [error, setError] = useState();
     const [formState, dispatchFormState] = useReducer(reducer, initialState);
 
-    const controladorCambiosEntrada = useCallback( (idEntrada, valorEntrada) => {
+    const controladorCambiosEntrada = useCallback((idEntrada, valorEntrada) => {
         const resultado = validarEntrada(idEntrada, valorEntrada);
-        dispatchFormState({ idEntrada, resultadoValidacion: resultado })
+        dispatchFormState({ idEntrada, resultadoValidacion: resultado, valorEntrada })
     }, [dispatchFormState])
+
+    useEffect(()=>{
+        if(error){
+            Alert.alert("Ocurrió un error", error, [{text:"OK"}]);
+        }
+        else{
+            //Alert.alert("¡Registro exitoso!", error, [{text:"OK"}]);
+        }
+    }, [error])
+
+    const controladorAutenticacion = async () => {
+        try {
+            await registrar(
+                formState.valoresEntrada.nombreUsuario,
+                formState.valoresEntrada.nombre,
+                formState.valoresEntrada.apellido,
+                formState.valoresEntrada.correo,
+                formState.valoresEntrada.contrasenia
+            );
+            setError(null);
+        } catch (error) {
+            setError(error.message);
+        }
+    }
 
     return (
         //Regresar multiples elementos
@@ -89,7 +123,7 @@ const FormularioRegistro = props => {
 
             <BotonEnviar
                 title='Registrar'
-                onPress={() => console.log("¡Presionado!")}
+                onPress={controladorAutenticacion}
                 style={{ marginTop: 20 }}
                 disabled={!formState.formularioValido} />
 
