@@ -10,6 +10,7 @@ const Navegador = (props) => {
     // Para ir a la pantalla de chats una vez que se haya registrado
     const estaAutenticado = useSelector(state => state.autenticacion.token !== null && state.autenticacion.token != "");
 
+    // Si es que se ha guardado la sesion
     const intentoAutoAccesar = useSelector(state => state.autenticacion.intentoAutoAccesar);
 
     return (

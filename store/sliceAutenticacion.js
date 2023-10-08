@@ -25,6 +25,9 @@ const sliceAutenticacion = createSlice({
             state.token = null;
             state.datosUsuario = null;
             state.intentoAutoAccesar = false;
+        },
+        modificarDatosUsuario: (state, action) => {
+            state.datosUsuario={...state.datosUsuario, ...action.payload.nuevosDatosUsuario}
         }
     }
 });
@@ -32,4 +35,5 @@ const sliceAutenticacion = createSlice({
 export const autenticar = sliceAutenticacion.actions.autenticar;
 export const setSeIntentoAutoAccesar = sliceAutenticacion.actions.setSeIntentoAutoAccesar;
 export const cerrarSesion = sliceAutenticacion.actions.cerrarSesion;
+export const modificarDatosUsuario = sliceAutenticacion.actions.modificarDatosUsuario;
 export default sliceAutenticacion.reducer;

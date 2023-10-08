@@ -1,13 +1,17 @@
 import { StyleSheet, Text, TextInput, View } from "react-native"
 
 import colores from "../constantes/colores";
+import { useState } from "react";
 
 const Entrada = props => {
 
-    const onChangeText = texo => {
-        props.cambioEntrada(props.id, texo);
-    }
+    const [value, setValue] = useState(props.initialValue);
+    //console.log(value);
 
+    const onChangeText = texto => {
+        setValue(texto);
+        props.cambioEntrada(props.id, texto);
+    }
 
     return <View style={styles.contenedor}>
 
@@ -23,7 +27,8 @@ const Entrada = props => {
             <TextInput
                 {...props}
                 style={styles.entrada}
-                onChangeText={onChangeText} />
+                onChangeText={onChangeText}
+                value={value} />
         </View>
 
         {

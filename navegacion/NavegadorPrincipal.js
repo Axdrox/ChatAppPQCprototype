@@ -4,7 +4,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack'; //S
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 //import Ionicons from '@expo/vector-icons/Ionicons'
 import { Entypo } from '@expo/vector-icons';
-import { FontAwesome } from '@expo/vector-icons';
+import { FontAwesome5 } from '@expo/vector-icons';
 
 //Locales
 import ListaConversaciones from '../pantallas/ListaConversaciones';
@@ -20,7 +20,8 @@ const Tab = createBottomTabNavigator();
 const TabNavigator = () => {
     return (
         <Tab.Navigator screenOptions={{
-            headerTitle: ''
+            headerTitle: '',
+            headerShadowVisible: false
         }}>
             <Tab.Screen name="ListaConversaciones" component={ListaConversaciones} options={{
                 tabBarLabel: 'Conversaciones',
@@ -31,7 +32,7 @@ const TabNavigator = () => {
             <Tab.Screen name="ConfiguracionPerfil" component={ConfiguracionPerfil} options={{
                 tabBarLabel: 'Configurar Perfil',
                 tabBarIcon: ({ color, size }) => (
-                    <FontAwesome name="gear" size={size} color={color} />
+                    <FontAwesome5 name="user-cog" size={size} color={color} />
                 )
             }} />
         </Tab.Navigator>

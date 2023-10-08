@@ -5,5 +5,6 @@ export default {
     azulIndigo: "#1E2842",
     azulMedianoche: "#15171C",
     blueberry: "#4D648D",
-    periwinkle: "#C6D8F7"
+    periwinkle: "#C6D8F7",
+    rojoMorado: "#953553",
 }

@@ -1,6 +1,6 @@
 import app from '../firebaseHelper';
 import { createUserWithEmailAndPassword, getAuth, signInWithEmailAndPassword } from 'firebase/auth';
-import { child, getDatabase, ref, set } from 'firebase/database'
+import { child, getDatabase, ref, set, update } from 'firebase/database'
 import { autenticar, cerrarSesion } from '../../store/sliceAutenticacion';
 import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
 import { obtenerDatosUsuario } from './usuario';
@@ -133,4 +133,11 @@ const guardarDatos = (token, idUsuario, fechaExpiracionToken) => {
         idUsuario,
         fechaExpiracionToken: fechaExpiracionToken.toISOString()
     }));
+}
+
+export const actualizarDatosUsuario = async (idUsuario, nuevosDatos) => {
+    // Da la referencia a la base de datos de la aplicacion en Firebase
+    const referenciaBaseDatos = ref(getDatabase());
+    const referenciaHijo = child(referenciaBaseDatos, `usuarios/${idUsuario}`);
+    await update(referenciaHijo, nuevosDatos);
 }
