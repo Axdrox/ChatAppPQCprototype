@@ -9,7 +9,9 @@ import BotonEnviar from '../componentes/BotonEnviar';
 import { validarEntrada } from "../utils/acciones/formulario";
 import { reducer } from "../utils/reductores/formulario";
 import { registrar } from "../utils/acciones/autenticacion";
-import { Alert } from "react-native";
+import { ActivityIndicator, Alert } from "react-native";
+import colores from "../constantes/colores";
+import { useDispatch, useSelector } from "react-redux";
 
 const initialState = {
     valoresEntrada: {
@@ -41,26 +43,34 @@ const FormularioRegistro = props => {
             cambioEntrada={controladorCambiosEntrada} />
     */
 
-    const [error, setError] = useState();
+    // Permite que se pueda utilizar una funcion que se puede
+    // utilizar en cualquier punto para actualizar el estado
+    // NOTA: unicamente se puede actualizar el estado despachando acciones
+    const dispatch = useDispatch();
+    
+    // Para accesar al estado EJEMPLO
+    //const stateData = useSelector(state => state.autenticacion);
+    //console.log(stateData);
+
+    const [error, setError] = useState(null);
+    const [cargando, setCargando] = useState(false);
     const [formState, dispatchFormState] = useReducer(reducer, initialState);
 
     const controladorCambiosEntrada = useCallback((idEntrada, valorEntrada) => {
         const resultado = validarEntrada(idEntrada, valorEntrada);
         dispatchFormState({ idEntrada, resultadoValidacion: resultado, valorEntrada })
-    }, [dispatchFormState])
+    }, [dispatchFormState]);
 
-    useEffect(()=>{
-        if(error){
-            Alert.alert("Ocurrió un error", error, [{text:"OK"}]);
+    useEffect(() => {
+        if (error) {
+            Alert.alert("Ocurrió un error", error, [{ text: "OK" }]);
         }
-        else{
-            //Alert.alert("¡Registro exitoso!", error, [{text:"OK"}]);
-        }
-    }, [error])
+    }, [error]);
 
-    const controladorAutenticacion = async () => {
+    const controladorAutenticacion = useCallback(async () => {
         try {
-            await registrar(
+            setCargando(true);
+            const accion = registrar(
                 formState.valoresEntrada.nombreUsuario,
                 formState.valoresEntrada.nombre,
                 formState.valoresEntrada.apellido,
@@ -68,13 +78,16 @@ const FormularioRegistro = props => {
                 formState.valoresEntrada.contrasenia
             );
             setError(null);
+            await dispatch(accion);
+            Alert.alert("Registro exitoso ✅", "¡Bienvenido!", [{ text: "OK" }]);
         } catch (error) {
             setError(error.message);
+            setCargando(false);
         }
-    }
+    }, [dispatch, formState]);
 
     return (
-        //Regresar multiples elementos
+        //Regresar multiples elementoshttps://console.firebase.google.com/u/6/project/chat-app-pqc-prototype/authentication/users?hl=es-419
         <>
             <Entrada
                 id="nombreUsuario"
@@ -121,12 +134,15 @@ const FormularioRegistro = props => {
                 cambioEntrada={controladorCambiosEntrada}
                 errorTexto={formState.validacionesEntrada["contrasenia"]} />
 
-            <BotonEnviar
-                title='Registrar'
-                onPress={controladorAutenticacion}
-                style={{ marginTop: 20 }}
-                disabled={!formState.formularioValido} />
-
+            {
+                cargando ?
+                    <ActivityIndicator size={'small'} color={colores.blueberry} style={{ marginTop: 10 }} /> :
+                    <BotonEnviar
+                        title='Registrar'
+                        onPress={controladorAutenticacion}
+                        style={{ marginTop: 20 }}
+                        disabled={!formState.formularioValido} />
+            }
         </>
     )
 };

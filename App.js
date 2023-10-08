@@ -6,8 +6,14 @@ import * as SplashScreen from 'expo-splash-screen';
 import { useCallback, useEffect, useState } from 'react';
 import * as Font from 'expo-font'
 import Navegador from './navegacion/Navegador';
+import { Provider } from 'react-redux';
+import { store } from './store/store';
+import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
 
 //LogBox.ignoreLogs(['AsyncStorage has been stracted']);
+
+// Si se quiere forzar no guardar el token por consecuencia no pasa del login
+//ReactNativeAsyncStorage.clear();
 
 SplashScreen.preventAutoHideAsync();
 
@@ -63,9 +69,11 @@ export default function App() {
   }
 
   return (
-    <SafeAreaProvider style={styles.container} onLayout={onLayout}>
-      <Navegador/>
-    </SafeAreaProvider>
+    <Provider store={store}>
+      <SafeAreaProvider style={styles.container} onLayout={onLayout}>
+        <Navegador />
+      </SafeAreaProvider>
+    </Provider>
   );
 }
 
