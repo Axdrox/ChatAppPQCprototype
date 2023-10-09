@@ -97,7 +97,12 @@ const ConfiguracionPerfil = props => {
 
                 <View style={{ alignItems: 'center' }}>
                     <TituloPagina texto="Configuración de perfil" />
-                    <FotoPerfil size={100} />
+                    <FotoPerfil
+                        size={100}
+                        idUsuario={datosUsuario.idUsuario}
+                        //Se carga la foto de Firebase
+                        uri={datosUsuario.fotoPerfil}
+                    />
                 </View>
 
                 <Entrada
