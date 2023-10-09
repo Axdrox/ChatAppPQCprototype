@@ -2,6 +2,7 @@ import React, { useCallback, useState } from 'react';
 import { View, Text, StyleSheet, ImageBackground, Button, TextInput, SafeAreaView, TouchableOpacity } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
+// Locales
 import imagenFondoPantalla from '../assets/imagenes/abstractWallpaper_00.jpg'
 import colores from '../constantes/colores';
 
@@ -31,6 +32,7 @@ const Conversacion = props => {
                     onSubmitEditing={enviarMensaje} />
 
                 {
+                    //Para desactivar el boton de enviar si no se ha escrito nada
                     mensajeTexto === "" &&
                     <TouchableOpacity disabled={true}
                         style={styles.botonEnviar}>
@@ -39,6 +41,7 @@ const Conversacion = props => {
                 }
 
                 {
+                    //Para activar el boton de enviar si se escribe algo
                     mensajeTexto !== "" &&
                     <TouchableOpacity disabled={false}
                         style={styles.botonEnviar}

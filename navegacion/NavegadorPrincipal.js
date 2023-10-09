@@ -10,6 +10,7 @@ import { FontAwesome5 } from '@expo/vector-icons';
 import ListaConversaciones from '../pantallas/ListaConversaciones';
 import Conversacion from '../pantallas/Conversacion';
 import ConfiguracionPerfil from '../pantallas/ConfiguracionPerfil';
+import NuevaConversacion from "../pantallas/NuevaConversacion";
 
 //React Navigator
 //const Stack = createStackNavigator();//StackAPI
@@ -42,12 +43,21 @@ const TabNavigator = () => {
 const NavegadorPrincipal = props => {
     return (
         <Stack.Navigator>
-            <Stack.Screen name="Home" component={TabNavigator} options={{
-                headerShown: false
-            }} />
-            <Stack.Screen name="Conversacion" component={Conversacion} options={{
-                headerTitle: ""
-            }} />
+            {/* Stack.Group: Para organizar las pantallas de una forma más efectiva
+                las Stack.Screen que están dentro de Stack.Group comparten compartir 
+                las opciones */}
+            <Stack.Group>
+                <Stack.Screen name="Home" component={TabNavigator} options={{
+                    headerShown: false
+                }} />
+                <Stack.Screen name="Conversacion" component={Conversacion} options={{
+                    headerTitle: ""
+                }} />
+            </Stack.Group>
+
+            <Stack.Group screenOptions={{presentation: 'containedModal'}}>
+                <Stack.Screen name="NuevaConversacion" component={NuevaConversacion} />
+            </Stack.Group>
         </Stack.Navigator>
     );
 };

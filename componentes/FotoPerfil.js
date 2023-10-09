@@ -24,6 +24,9 @@ const FotoPerfil = props => {
     // Pasarlo al formulario: se pasa desde configuracion de perfil
     const idUsuario = props.idUsuario;
 
+    // Para poder ocultar las propiedades (boton editar y elegir imagen) al buscar los usuarios
+    const mostrarBotonEditar = props.mostrarBotonEditar && props.mostrarBotonEditar === true;
+
     const elegirImagen = async () => {
         try {
             const uriTemporal = await lanzarSelectorImagen();
@@ -54,8 +57,14 @@ const FotoPerfil = props => {
         }
     }
 
+    // Para controlar el tipo de elemento que es dependiendo si se esta buscando un usuario
+    // o cuando se esta configurando el perfil, ya que, unicamente se debe poder editar la foto
+    // cuando se modifica el perfil y no en los resultados de la busqueda
+    // NOTA: los componentes necesitan estar en mayuscula siempre en React
+    const Contenedor = mostrarBotonEditar ? TouchableOpacity : View;
+
     return (
-        <TouchableOpacity onPress={elegirImagen}>
+        <Contenedor onPress={elegirImagen}>
             {
                 // Mientras este cargando, muestra que esta cargando, de otra forma muestra la imagen
                 estaCargando ?
@@ -68,10 +77,15 @@ const FotoPerfil = props => {
                     />
             }
 
-            <View style={styles.editarIcono}>
-                <MaterialCommunityIcons name="pencil-circle" size={24} color={colores.blueberry} />
-            </View>
-        </TouchableOpacity>
+            {
+                !estaCargando && mostrarBotonEditar &&
+                <View style={styles.editarIcono}>
+                    <MaterialCommunityIcons name="pencil-circle" size={24} color={colores.blueberry} />
+                </View>
+            }
+
+
+        </Contenedor>
     )
 };
 

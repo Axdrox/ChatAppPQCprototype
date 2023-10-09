@@ -102,6 +102,7 @@ const ConfiguracionPerfil = props => {
                         idUsuario={datosUsuario.idUsuario}
                         //Se carga la foto de Firebase
                         uri={datosUsuario.fotoPerfil}
+                        mostrarBotonEditar={true}
                     />
                 </View>
 
