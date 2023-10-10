@@ -31,7 +31,7 @@ const ConfiguracionPerfil = props => {
     const nombreUsuario = datosUsuario.nombreUsuario || "";
     const nombre = datosUsuario.nombre || "";
     const apellido = datosUsuario.apellido || "";
-    const correo = datosUsuario.correo || "";
+    //const correo = datosUsuario.correo || "";
 
     const initialState = {
         valoresEntrada: {

@@ -9,15 +9,22 @@ import colores from '../constantes/colores';
 import estilos from '../constantes/estilos';
 import { buscarUsuarios } from '../utils/acciones/usuario';
 import DatosItem from '../componentes/DatosItem';
+import { useDispatch, useSelector } from 'react-redux';
+import { setUsuariosAlmacenados } from '../store/sliceUsuario';
 
 const NuevaConversacion = props => {
+    //Para poder modificar el estado
+    const dispatch = useDispatch();
+
     //Varialbes de estado para mostrar cuando no se ha encontrado nada o no se ha realizado busqueda
     const [cargando, setCargando] = useState(false);
     const [usuarios, setUsuarios] = useState();
     const [sinResultados, setSinResultados] = useState(false);
-    //Para actualizar conforme el usuario escriba
+    // Para actualizar conforme el usuario escriba
     const [terminoDeBusqueda, setTerminoDeBusqueda] = useState('');
 
+    // Datos del usuario actual
+    const datosUsuario = useSelector(state => state.autenticacion.datosUsuario);
 
     // Todo lo que actualiza los botones de navegacion de header
     // son efectos, por eso se utiliza
@@ -55,6 +62,10 @@ const NuevaConversacion = props => {
 
             // Acciones->Usuario: Ejecutar consulta en Firebase
             const resultadosDeUsuario = await buscarUsuarios(terminoDeBusqueda);
+
+            // Para que no muestre nuestro usuario al realizar busqueda
+            delete resultadosDeUsuario[datosUsuario.idUsuario];
+
             setUsuarios(resultadosDeUsuario);
 
             if (Object.keys(resultadosDeUsuario).length === 0) {
@@ -62,6 +73,7 @@ const NuevaConversacion = props => {
             }
             else {
                 setSinResultados(false);
+                dispatch(setUsuariosAlmacenados({nuevosUsuarios: resultadosDeUsuario}))
             }
 
             setCargando(false);
@@ -70,6 +82,12 @@ const NuevaConversacion = props => {
         // Para no crear un timer cada ocasion que se realiza una busqueda
         return () => clearTimeout(retrasarBusqueda);
     }, [terminoDeBusqueda]);
+
+    const usuarioSeleccionado = idUsuario => {
+        props.navigation.navigate("ListaConversaciones", {
+            idUsuarioSeleccionado: idUsuario
+        })
+    }
 
     return <ContenedorPagina>
 
@@ -103,6 +121,7 @@ const NuevaConversacion = props => {
                     return <DatosItem
                         titulo={`${datosUsuario.nombre} ${datosUsuario.apellido}`}
                         imagen={datosUsuario.fotoPerfil}
+                        onPress={() => usuarioSeleccionado(idUsuario)}
                     />
                 }}
             />

@@ -11,7 +11,7 @@ const DatosItem = props => {
     // coinciden con la busqueda y los puede seleccionar
     // Usado en "NuevaConversacion"
     return (
-        <TouchableWithoutFeedback>
+        <TouchableWithoutFeedback onPress={props.onPress}>
             <View style={styles.contenedor}>
 
                 <FotoPerfil

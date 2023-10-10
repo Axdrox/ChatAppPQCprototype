@@ -47,7 +47,7 @@ const FormularioRegistro = props => {
     // utilizar en cualquier punto para actualizar el estado
     // NOTA: unicamente se puede actualizar el estado despachando acciones
     const dispatch = useDispatch();
-    
+
     // Para accesar al estado EJEMPLO
     //const stateData = useSelector(state => state.autenticacion);
     //console.log(stateData);

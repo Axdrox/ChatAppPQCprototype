@@ -1,26 +1,74 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ImageBackground, Button, TextInput, SafeAreaView, TouchableOpacity } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { useSelector } from 'react-redux';
 
 // Locales
-import imagenFondoPantalla from '../assets/imagenes/abstractWallpaper_00.jpg'
+import imagenFondoPantalla from '../assets/imagenes/abstractWallpaper_00.jpg';
 import colores from '../constantes/colores';
-
+import ContenedorPagina from "../componentes/ContenedorPagina";
+import Burbuja from '../componentes/Burbuja';
+import { crearConversacion } from '../utils/acciones/accionesConversacion';
 
 const Conversacion = props => {
+    const datosUsuario = useSelector(state => state.autenticacion.datosUsuario);
+    const usuariosAlmacenados = useSelector(state => state.usuarios.usuariosAlmacenados);
+    //console.log(usuariosAlmacenados);
+
+    const [conversacionUsuarios, setConversacionUsuarios] = useState([]);
     const [mensajeTexto, setMensajeTexto] = useState("");
-    //console.log(mensajeTexto)
+    const [idConversacion, setIdConversacion] = useState(props.route?.params?.idConversacion);
+    //console.log(idConversacion);
+
+    const datosConversacion = props.route?.params?.newDatosConversacion;
+    //console.log(datosConversacion);
+
+    const obtenerTituloDeNombre = () => {
+        //                              que encuentre los idUsuario que no coincida con el nuestro
+        const idDeOtrosUsuarios = conversacionUsuarios.find(uid => uid !== datosUsuario.idUsuario);
+        const datosDeOtrosUsuarios = usuariosAlmacenados[idDeOtrosUsuarios];
+
+        return datosDeOtrosUsuarios && `${datosDeOtrosUsuarios.nombre} ${datosDeOtrosUsuarios.apellido}`;
+    }
+
+    useEffect(() => {
+
+        props.navigation.setOptions({
+            headerTitle: obtenerTituloDeNombre(),
+        })
+
+        setConversacionUsuarios(datosConversacion.usuarios)
+    }, [conversacionUsuarios]);
 
     // Para que no renderice el mensaje aunque cambie el estado
-    const enviarMensaje = useCallback(() => {
+    const enviarMensaje = useCallback(async () => {
+        // Interaccion con Firebase
+        try {
+            let id = idConversacion;
+            if (!id) {
+                // Si no existe un id de conversacion (es nueva la conversacion)
+                // crear conversacion a partir del primer mensaje enviado
+                id = await crearConversacion(datosUsuario.idUsuario, props.route.params.newDatosConversacion);
+                setIdConversacion(id);
+            }
+        } catch (error) {
+            console.log(error);
+        }
+
         setMensajeTexto("");
-    }, [mensajeTexto]);
+    }, [mensajeTexto, idConversacion]);
 
     return (
         <SafeAreaView
             edges={['right', 'left', 'bottom']}
             style={styles.container}>
             <ImageBackground source={imagenFondoPantalla} style={styles.imagenFondoPantalla}>
+
+                <ContenedorPagina style={{ backgroundColor: 'transparent' }}>
+                    {
+                        !idConversacion && <Burbuja texto="¡Nueva conversación! ^⁠⁠‿⁠^)/" tipo="sistema" />
+                    }
+                </ContenedorPagina>
 
             </ImageBackground>
             <View style={styles.contenedorEntrada}>
@@ -36,7 +84,7 @@ const Conversacion = props => {
                     mensajeTexto === "" &&
                     <TouchableOpacity disabled={true}
                         style={styles.botonEnviar}>
-                        <MaterialCommunityIcons name="send-circle-outline" size={35} color={colores.grisClaro} />
+                        <MaterialCommunityIcons name="send-circle-outline" size={35} color={colores.periwinkle} />
                     </TouchableOpacity>
                 }
 
@@ -46,7 +94,7 @@ const Conversacion = props => {
                     <TouchableOpacity disabled={false}
                         style={styles.botonEnviar}
                         onPress={enviarMensaje}>
-                        <MaterialCommunityIcons name="send-circle-outline" size={35} color={colores.azul} />
+                        <MaterialCommunityIcons name="send-circle-outline" size={35} color={colores.blueberry} />
                     </TouchableOpacity>
                 }
 

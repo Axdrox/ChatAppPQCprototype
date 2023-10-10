@@ -34,7 +34,7 @@ export const registrar = (nombreUsuario, nombre, apellido, correo, contrasenia) 
             //Para cerrar la sesion
             //NOTA: se puede reemplazar la variable "milisegundosHastaExpiracion" 
             //por 3000 para que se cierre la sesion en 3 segundos
-            temporizador=setTimeout(()=>{
+            temporizador = setTimeout(() => {
                 dispatch(terminarSesion());
             }, milisegundosHastaExpiracion);
 
@@ -80,7 +80,7 @@ export const autorizarAcceso = (correo, contrasenia) => {
             //Para cerrar la sesion
             //NOTA: se puede reemplazar la variable "milisegundosHastaExpiracion" 
             //por 3000 para que se cierre la sesion en 3 segundos
-            temporizador=setTimeout(()=>{
+            temporizador = setTimeout(() => {
                 dispatch(terminarSesion());
             }, milisegundosHastaExpiracion);
 
@@ -93,7 +93,7 @@ export const autorizarAcceso = (correo, contrasenia) => {
             if (codigoError === "auth/invalid-login-credentials" || codigoError === "auth/user-not-found" || codigoError === "auth/invalid-password") {
                 mensaje = "El correo o contraseña ingresados son incorrectos."
             }
-            if(codigoError=== "auth/too-many-requests"){
+            if (codigoError === "auth/too-many-requests") {
                 mensaje = "Intentos agotados, probar más tarde.⌛"
             }
             throw new Error(mensaje);
@@ -121,7 +121,7 @@ const crearUsuario = async (nombreUsuario, nombre, apellido, correo, idUsuario) 
     };
 
     // Da la referencia a la base de datos de la aplicacion en Firebase
-    const referenciaBaseDatos = ref(getDatabase());
+    const referenciaBaseDatos = ref(getDatabase(app));
     const referenciaHijo = child(referenciaBaseDatos, `usuarios/${idUsuario}`);
     await set(referenciaHijo, datosUsuario);
     return datosUsuario;
@@ -137,7 +137,7 @@ const guardarDatos = (token, idUsuario, fechaExpiracionToken) => {
 
 export const actualizarDatosUsuario = async (idUsuario, nuevosDatos) => {
     // Da la referencia a la base de datos de la aplicacion en Firebase
-    const referenciaBaseDatos = ref(getDatabase());
+    const referenciaBaseDatos = ref(getDatabase(app));
     const referenciaHijo = child(referenciaBaseDatos, `usuarios/${idUsuario}`);
     await update(referenciaHijo, nuevosDatos);
 }
