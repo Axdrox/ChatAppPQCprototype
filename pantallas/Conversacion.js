@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ImageBackground, Button, TextInput, SafeAreaView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ImageBackground, Button, TextInput, SafeAreaView, TouchableOpacity, FlatList } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useSelector } from 'react-redux';
 
@@ -8,17 +8,37 @@ import imagenFondoPantalla from '../assets/imagenes/abstractWallpaper_00.jpg';
 import colores from '../constantes/colores';
 import ContenedorPagina from "../componentes/ContenedorPagina";
 import Burbuja from '../componentes/Burbuja';
-import { crearConversacion } from '../utils/acciones/accionesConversacion';
+import { crearConversacion, enviarMensajeTexto } from '../utils/acciones/accionesConversacion';
 
 const Conversacion = props => {
-    const datosUsuario = useSelector(state => state.autenticacion.datosUsuario);
-    const usuariosAlmacenados = useSelector(state => state.usuarios.usuariosAlmacenados);
-    const conversacionesAlmacenadas = useSelector(state => state.conversaciones.datosConversacion);
-
+    //Variables de estado
     const [conversacionUsuarios, setConversacionUsuarios] = useState([]);
     const [mensajeTexto, setMensajeTexto] = useState("");
     const [idConversacion, setIdConversacion] = useState(props.route?.params?.idConversacion);
-    //console.log(idConversacion);
+    //Para mostrar un error en caso de que exista
+    const [bannerDeError, setBannerDeError] = useState("");
+
+    const datosUsuario = useSelector(state => state.autenticacion.datosUsuario);
+    const usuariosAlmacenados = useSelector(state => state.usuarios.usuariosAlmacenados);
+    const conversacionesAlmacenadas = useSelector(state => state.conversaciones.datosConversacion);
+    // PODRIA OCUPARSE CRIPTOGRAFIA PARA DESCIFRAR MENSAJES
+    const mensajesConversacion = useSelector(state => {
+        if (!idConversacion) return [];
+        const datosDelMensajeDeConversacion = state.mensajes.datosMensajes[idConversacion];
+
+        if (!datosDelMensajeDeConversacion) return [];
+
+        const listaMensajes = [];
+
+        // key: Para ubicarla en la base de datos: mensajes->idConversacion->"key"->datos
+        for (const key in datosDelMensajeDeConversacion) {
+            const mensaje = datosDelMensajeDeConversacion[key];
+            mensaje.key = key;
+            //Se llena el arreglo de mensajes que corresponden a la conversacion de los usuaios
+            listaMensajes.push(mensaje);
+        }
+        return listaMensajes;
+    });
 
     // Si existe un idConversacion, almacena los datos de la conversacion en conversacionesAlmacenadas respecto a ese idConversacion, si no, que sean nuevos datos de conversacion
     const datosConversacion = (idConversacion && conversacionesAlmacenadas[idConversacion]) || props.route?.params?.newDatosConversacion;
@@ -49,14 +69,23 @@ const Conversacion = props => {
             if (!id) {
                 // Si no existe un id de conversacion (es nueva la conversacion)
                 // crear conversacion a partir del primer mensaje enviado
+                // NOTA: AQUI SE PUEDE UTILIZAR CRIPTOGRAFIA PARA LA PARTE DE SUBIR LA CLAVE PUBLICA DE KYBER
                 id = await crearConversacion(datosUsuario.idUsuario, props.route.params.newDatosConversacion);
                 setIdConversacion(id);
             }
+
+            //Logica para crear el mensaje y mandarlo a la base de datos en Firebase
+            //NOTA: AQUI SE PUEDE UTILIZAR CRIPTOGRAFIA PARA CIFRAR EL MENSAJE
+            await enviarMensajeTexto(idConversacion, datosUsuario.idUsuario, mensajeTexto);
+
+            setMensajeTexto("");
         } catch (error) {
             console.log(error);
+            setBannerDeError("Error al enviar mensaje (⁠-⁠︵⁠-⁠,⁠)");
+            setTimeout(() => setBannerDeError(""), 3000);
         }
 
-        setMensajeTexto("");
+
     }, [mensajeTexto, idConversacion]);
 
     return (
@@ -68,6 +97,32 @@ const Conversacion = props => {
                 <ContenedorPagina style={{ backgroundColor: 'transparent' }}>
                     {
                         !idConversacion && <Burbuja texto="¡Nueva conversación! ^⁠⁠‿⁠^)/" tipo="sistema" />
+                    }
+
+                    {
+                        bannerDeError !== "" && <Burbuja texto={bannerDeError} tipo="sistema-error" />
+                    }
+
+                    {
+                        // AQUI SE PODRIA UTILIZAR CRIPTO PARA DESCIFRAR LOS MENSAJES
+                        idConversacion &&
+                        <FlatList
+                            data={mensajesConversacion}
+                            renderItem={(itemData) => {
+                                //Contiene todo los datos de cada mensaje
+                                const mensaje = itemData.item;
+
+                                // Mensaje enviado por el usuario actual
+                                const mensajePropio = mensaje.enviadoPor === datosUsuario.idUsuario;
+
+                                const tipoMensaje = mensajePropio ? "mensaje-propio" : "mensaje-otro-usuario";
+                                console.log("tipo Mensaje: " + tipoMensaje);
+                                return <Burbuja
+                                    tipo={tipoMensaje}
+                                    texto={mensaje.mensajeTexto}
+                                />
+                            }}
+                        />
                     }
                 </ContenedorPagina>
 

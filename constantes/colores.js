@@ -6,5 +6,6 @@ export default {
     azulMedianoche: "#15171C",
     blueberry: "#4D648D",
     periwinkle: "#C6D8F7",
+    azulOtroUsuario: "#A2B1CA",
     rojoMorado: "#953553",
 }

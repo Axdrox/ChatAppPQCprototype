@@ -10,7 +10,7 @@ const sliceConversacion = createSlice({
     },
     reducers: {
         setDatosConversacion: (state, action) => {
-            state.datosConversacion = action.payload.datosConversacion;
+            state.datosConversacion = { ...action.payload.datosConversacion };
         }
     }
 });

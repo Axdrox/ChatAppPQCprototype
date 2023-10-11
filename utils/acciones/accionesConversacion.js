@@ -1,7 +1,7 @@
 import { child, getDatabase, push, ref } from "firebase/database";
 import { app } from '../firebaseHelper';
 
-// AQUI SE PUEDE UTILIZAR CRIPTOGRAFIA
+// AQUI SE PUEDE UTILIZAR CRIPTOGRAFIA PARA LA PARTE DE SUBIR LA CLAVE PUBLICA DE KYBER
 export const crearConversacion = async (idUsuarioQueInicioSesion, datosConversacion) => {
     const newDatosConversacion = {
         ...datosConversacion,
@@ -10,6 +10,7 @@ export const crearConversacion = async (idUsuarioQueInicioSesion, datosConversac
         actualizadoPor: idUsuarioQueInicioSesion,
         creadoEn: new Date().toISOString(),
         actualizadoEn: new Date().toISOString()
+        //CLAVEPUBLICAKYBER
     };
 
     const referenciaBaseDatos = ref(getDatabase(app));
@@ -22,4 +23,21 @@ export const crearConversacion = async (idUsuarioQueInicioSesion, datosConversac
         await push(child(referenciaBaseDatos, `conversacionesUsuario/${idUsuario}`), nuevaConversacion.key);
     }
     return nuevaConversacion.key;
+}
+
+// AQUI SE PUEDE UTILIZAR CRIPTOGRAFIA PARA CIFRAR EL MENSAJE
+export const enviarMensajeTexto = async (idConversacion, idEmisor, mensajeTexto) => {
+    const referenciaBaseDatos = ref(getDatabase(app));
+    //La referencia del nodo "mensajes" como se creara en la base de datos
+    const referenciaMensajes = child(referenciaBaseDatos, `mensajes/${idConversacion}`);
+
+    const datosMensaje = {
+        enviadoPor: idEmisor,
+        enviadoEn: new Date().toISOString(),
+        //MENSAJE CIFRADO
+        mensajeTexto: mensajeTexto
+    };
+
+    await push(referenciaMensajes, datosMensaje);
+
 }

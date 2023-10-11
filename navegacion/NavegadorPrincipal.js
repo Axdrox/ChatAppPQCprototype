@@ -19,6 +19,7 @@ import { ActivityIndicator, View } from "react-native";
 import colores from "../constantes/colores";
 import estilos from "../constantes/estilos";
 import { setUsuariosAlmacenados } from "../store/sliceUsuario";
+import { setMensajesConversacion } from "../store/sliceMensajes";
 
 
 //React Navigator
@@ -120,7 +121,7 @@ const NavegadorPrincipal = props => {
 
                             // No escucha cuando se hacen cambios, por lo que se ejecuta una vez, a diferencia de onValue
                             get(refUsuario).then(snapshotUsuario => {
-                                const snapshotDatosUsuario = snapshotUsuario.val(); 
+                                const snapshotDatosUsuario = snapshotUsuario.val();
                                 dispatch(setUsuariosAlmacenados({ nuevosUsuarios: { snapshotDatosUsuario } }));
                             });
 
@@ -136,6 +137,15 @@ const NavegadorPrincipal = props => {
                         setCargando(false);
                     }
                 });
+
+                // Obtener los mensajes de la base de datos
+                const referenciaMensajes = child(referenciaBaseDatos, `mensajes/${idConversacion}`);
+                referencias.push(referenciaMensajes);
+
+                onValue(referenciaMensajes, snapshotMensajes => {
+                    const datosMensajes = snapshotMensajes.val();
+                    dispatch(setMensajesConversacion({ idConversacion, datosMensajes }));
+                })
 
                 if (contadorDeConversacionesEncontradas == 0) {
                     //No se muestra el loading spinner

@@ -7,13 +7,37 @@ const Burbuja = props => {
 
     const estiloBurbuja = { ...styles.contenedor };
     const estiloTexto = { ...styles.texto };
+    const estiloEnvoltura = { ...styles.estiloDeEnvoltura };
 
     switch (tipo) {
         case "sistema":
-            estiloTexto.color = colores.azulMedianoche;
-            estiloBurbuja.backgroundColor = colores.periwinkle;
+            estiloTexto.color = 'white';
+            estiloBurbuja.backgroundColor = colores.blueberry;
+            estiloBurbuja.borderColor = colores.azulMedianoche;
             estiloBurbuja.alignItems = 'center';
             estiloBurbuja.marginTop = 10;
+            break;
+        case "sistema-error":
+            estiloTexto.color = "white";
+            estiloBurbuja.backgroundColor = colores.rojoMorado;
+            estiloBurbuja.borderColor = 'red';
+            estiloBurbuja.alignItems = 'center';
+            estiloBurbuja.borderRadius = 5;
+            estiloBurbuja.padding = 4;
+            estiloBurbuja.marginTop = 10;
+            break;
+        case "mensaje-propio":
+            estiloEnvoltura.justifyContent = 'flex-end';
+            estiloBurbuja.maxWidth = '70%';
+            estiloBurbuja.borderRadius = 15;
+            estiloBurbuja.padding = 4;
+            break;
+        case "mensaje-otro-usuario":
+            estiloEnvoltura.justifyContent = 'flex-start';
+            estiloBurbuja.backgroundColor = colores.azulOtroUsuario;
+            estiloBurbuja.maxWidth = '70%';
+            estiloBurbuja.borderRadius = 15;
+            estiloBurbuja.padding = 4;
             break;
 
         default:
@@ -21,7 +45,7 @@ const Burbuja = props => {
     }
 
     return (
-        <View style={styles.estiloDeWrapper}>
+        <View style={estiloEnvoltura}>
             <View style={estiloBurbuja}>
                 <Text style={estiloTexto}>
                     {texto}
@@ -32,9 +56,9 @@ const Burbuja = props => {
 };
 
 const styles = StyleSheet.create({
-    estiloDeWrapper: {
+    estiloDeEnvoltura: {
         flexDirection: 'row',
-        justifyContent: 'center'
+        justifyContent: 'center',
     },
     texto: {
         fontFamily: 'regular',
@@ -46,7 +70,8 @@ const styles = StyleSheet.create({
         padding: 2,
         marginBottom: 10,
         borderColor: colores.blueberry,
-        borderWidth: 1
+        borderWidth: 1,
+        alignItems: 'center'
     }
 });
 
