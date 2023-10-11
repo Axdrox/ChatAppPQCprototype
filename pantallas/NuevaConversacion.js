@@ -73,7 +73,7 @@ const NuevaConversacion = props => {
             }
             else {
                 setSinResultados(false);
-                dispatch(setUsuariosAlmacenados({nuevosUsuarios: resultadosDeUsuario}))
+                dispatch(setUsuariosAlmacenados({nuevosUsuarios: resultadosDeUsuario}));
             }
 
             setCargando(false);

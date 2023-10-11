@@ -10,7 +10,7 @@ import { Provider } from 'react-redux';
 import { store } from './store/store';
 import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
 
-//LogBox.ignoreLogs(['AsyncStorage has been stracted']);
+LogBox.ignoreLogs(['Selector unknown returned a different result when called with the same parameters. This can lead to unnecessary rerenders.']);
 
 // Si se quiere forzar no guardar el token por consecuencia no pasa del login
 //ReactNativeAsyncStorage.clear();

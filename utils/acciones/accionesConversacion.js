@@ -5,6 +5,7 @@ import { app } from '../firebaseHelper';
 export const crearConversacion = async (idUsuarioQueInicioSesion, datosConversacion) => {
     const newDatosConversacion = {
         ...datosConversacion,
+        //SE PODRIAN QUITAR
         creadoPor: idUsuarioQueInicioSesion,
         actualizadoPor: idUsuarioQueInicioSesion,
         creadoEn: new Date().toISOString(),

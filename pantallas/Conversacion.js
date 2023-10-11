@@ -13,14 +13,15 @@ import { crearConversacion } from '../utils/acciones/accionesConversacion';
 const Conversacion = props => {
     const datosUsuario = useSelector(state => state.autenticacion.datosUsuario);
     const usuariosAlmacenados = useSelector(state => state.usuarios.usuariosAlmacenados);
-    //console.log(usuariosAlmacenados);
+    const conversacionesAlmacenadas = useSelector(state => state.conversaciones.datosConversacion);
 
     const [conversacionUsuarios, setConversacionUsuarios] = useState([]);
     const [mensajeTexto, setMensajeTexto] = useState("");
     const [idConversacion, setIdConversacion] = useState(props.route?.params?.idConversacion);
     //console.log(idConversacion);
 
-    const datosConversacion = props.route?.params?.newDatosConversacion;
+    // Si existe un idConversacion, almacena los datos de la conversacion en conversacionesAlmacenadas respecto a ese idConversacion, si no, que sean nuevos datos de conversacion
+    const datosConversacion = (idConversacion && conversacionesAlmacenadas[idConversacion]) || props.route?.params?.newDatosConversacion;
     //console.log(datosConversacion);
 
     const obtenerTituloDeNombre = () => {
