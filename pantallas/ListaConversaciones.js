@@ -13,6 +13,7 @@ const ListaConversaciones = props => {
     const usuarioSeleccionado = props.route?.params?.idUsuarioSeleccionado;
     //Datos del usuario que tiene la sesion abierta
     const datosUsuario = useSelector(state => state.autenticacion.datosUsuario);
+    //console.log(datosUsuario);
     const usuariosAlmacenados = useSelector(state => state.usuarios.usuariosAlmacenados);
 
     //Para mostrar las conversaciones encontradas (ubicado en: NavegadorPrincipal y ese llama sliceConversacion)
@@ -22,11 +23,16 @@ const ListaConversaciones = props => {
     // NOTA: SE PODRIA OPTIMIZAR ESTA PARTE, POR EL MOMENTO SE DEJARA ASI Y OMITIRA LA ADVERTENCIA EN "App.js -> LogBox.ignoreLogs" CHECAR https://redux.js.org/usage/deriving-data-selectors#optimizing-selectors-with-memoization
     const conversacionesDelUsuario = useSelector(state => {
         const datosDeConversaciones = state.conversaciones.datosConversacion;
+        //console.log(datosDeConversaciones);
         // Los muestra y ordena de acuerdo con la ultima actualzacion de la conversacion
         return Object.values(datosDeConversaciones).sort((a, b) => {
-            return new Date(b.actualizadoEn) - new Date(a.actualizadoEn);
+            const dateA = new Date(Date.parse(a.actualizadoEn)).getTime();
+            const dateB = new Date(Date.parse(b.actualizadoEn)).getTime();
+            return dateB - dateA;
         })
-    })
+    });
+
+    //console.log(conversacionesDelUsuario);
 
     // Todo lo que actualiza los botones de navegacion de header
     // son efectos, por eso se utiliza
@@ -72,15 +78,23 @@ const ListaConversaciones = props => {
                 //Se revisa el array "usuarios" que esta en el nodo conversacion 
                 const idOtroUsuario = datosConversacion.usuarios.find(uid => uid !== datosUsuario.idUsuario)
                 const otroUsuario = usuariosAlmacenados[idOtroUsuario];
+
                 if (!otroUsuario) return;
 
                 //Para desplegar la informacion del usuario
                 const titulo = `${otroUsuario.nombre} ${otroUsuario.apellido}`;
                 const imagen = otroUsuario.fotoPerfil;
 
+                // Mensaje actualizado para tener el control de quien fue el ultimo en actualizar el chat
+                const mensajePropio = datosConversacion.actualizadoPor === datosUsuario.idUsuario;
+                const tipoMensaje = mensajePropio ? "mensaje-propio" : "mensaje-otro-usuario";
+                //console.log("tipo Mensaje: " + tipoMensaje);
+                
+
                 return <DatosItem
                     titulo={titulo}
                     imagen={imagen}
+                    ultimoMensaje={tipoMensaje}
                     onPress={() => props.navigation.navigate("Conversacion", { idConversacion })}
                 />
             }}

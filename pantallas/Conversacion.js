@@ -40,6 +40,8 @@ const Conversacion = props => {
         return listaMensajes;
     });
 
+    //    console.log(mensajesConversacion);
+
     // Si existe un idConversacion, almacena los datos de la conversacion en conversacionesAlmacenadas respecto a ese idConversacion, si no, que sean nuevos datos de conversacion
     const datosConversacion = (idConversacion && conversacionesAlmacenadas[idConversacion]) || props.route?.params?.newDatosConversacion;
     //console.log(datosConversacion);
@@ -76,7 +78,8 @@ const Conversacion = props => {
 
             //Logica para crear el mensaje y mandarlo a la base de datos en Firebase
             //NOTA: AQUI SE PUEDE UTILIZAR CRIPTOGRAFIA PARA CIFRAR EL MENSAJE
-            await enviarMensajeTexto(idConversacion, datosUsuario.idUsuario, mensajeTexto);
+            //await enviarMensajeTexto(idConversacion, datosUsuario.idUsuario, mensajeTexto);
+            await enviarMensajeTexto(id, datosUsuario.idUsuario, mensajeTexto);
 
             setMensajeTexto("");
         } catch (error) {
@@ -116,7 +119,7 @@ const Conversacion = props => {
                                 const mensajePropio = mensaje.enviadoPor === datosUsuario.idUsuario;
 
                                 const tipoMensaje = mensajePropio ? "mensaje-propio" : "mensaje-otro-usuario";
-                                console.log("tipo Mensaje: " + tipoMensaje);
+                                //console.log("tipo Mensaje: " + tipoMensaje);
                                 return <Burbuja
                                     tipo={tipoMensaje}
                                     texto={mensaje.mensajeTexto}

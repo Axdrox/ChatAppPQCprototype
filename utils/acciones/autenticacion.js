@@ -7,6 +7,7 @@ import { obtenerDatosUsuario } from './usuario';
 
 let temporizador;
 
+//Funcion para registrar al usuario y que inicie sesion al registrarse
 // Funcion que una vez que se llame retorna una accion
 export const registrar = (nombreUsuario, nombre, apellido, correo, contrasenia) => {
     return async dispatch => {
@@ -23,7 +24,7 @@ export const registrar = (nombreUsuario, nombre, apellido, correo, contrasenia) 
             const tiempoActual = new Date();
             const milisegundosHastaExpiracion = fechaExpiracionToken - tiempoActual;
 
-            const datosUsuario = await crearUsuario(nombreUsuario, nombre, apellido, correo, uid);
+            const datosUsuario = await crearUsuario(nombreUsuario, nombre, apellido, /*correo,*/ uid);
             //console.log(datosUsuario);
 
             // Actualizando el estado
@@ -110,12 +111,12 @@ export const terminarSesion = () => {
     }
 }
 
-const crearUsuario = async (nombreUsuario, nombre, apellido, correo, idUsuario) => {
+const crearUsuario = async (nombreUsuario, nombre, apellido, /*correo, */ idUsuario) => {
     const datosUsuario = {
         nombreUsuario,
         nombre,
         apellido,
-        correo,
+        //correo,
         idUsuario,
         fechaRegistro: new Date().toISOString()
     };
