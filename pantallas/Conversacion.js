@@ -9,6 +9,7 @@ import colores from '../constantes/colores';
 import ContenedorPagina from "../componentes/ContenedorPagina";
 import Burbuja from '../componentes/Burbuja';
 import { crearConversacion, enviarMensajeTexto } from '../utils/acciones/accionesConversacion';
+import { createSelector } from '@reduxjs/toolkit';
 
 const Conversacion = props => {
     //Variables de estado
@@ -22,23 +23,22 @@ const Conversacion = props => {
     const usuariosAlmacenados = useSelector(state => state.usuarios.usuariosAlmacenados);
     const conversacionesAlmacenadas = useSelector(state => state.conversaciones.datosConversacion);
     // PODRIA OCUPARSE CRIPTOGRAFIA PARA DESCIFRAR MENSAJES
-    const mensajesConversacion = useSelector(state => {
-        if (!idConversacion) return [];
-        const datosDelMensajeDeConversacion = state.mensajes.datosMensajes[idConversacion];
-
-        if (!datosDelMensajeDeConversacion) return [];
-
-        const listaMensajes = [];
-
-        // key: Para ubicarla en la base de datos: mensajes->idConversacion->"key"->datos
-        for (const key in datosDelMensajeDeConversacion) {
+    
+    const selectMensajesConversacion = createSelector(
+        state => state.mensajes.datosMensajes[idConversacion],
+        (datosDelMensajeDeConversacion) => {
+          const listaMensajes = [];
+      
+          for (const key in datosDelMensajeDeConversacion) {
             const mensaje = datosDelMensajeDeConversacion[key];
             mensaje.key = key;
-            //Se llena el arreglo de mensajes que corresponden a la conversacion de los usuaios
             listaMensajes.push(mensaje);
+          }
+          return listaMensajes;
         }
-        return listaMensajes;
-    });
+      );
+
+      const mensajesConversacion = useSelector(selectMensajesConversacion);
 
     //    console.log(mensajesConversacion);
 

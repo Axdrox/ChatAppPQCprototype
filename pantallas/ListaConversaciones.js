@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { View, Text, StyleSheet, Button, FlatList } from 'react-native';
 import { HeaderButtons, Item } from 'react-navigation-header-buttons';
 import BotonPersonalizadoHeader from '../componentes/BotonPersonalizadoHeader';
@@ -16,22 +16,20 @@ const ListaConversaciones = props => {
     //console.log(datosUsuario);
     const usuariosAlmacenados = useSelector(state => state.usuarios.usuariosAlmacenados);
 
-    //Para mostrar las conversaciones encontradas (ubicado en: NavegadorPrincipal y ese llama sliceConversacion)
-    // recordar que tiene que coincidir con el key que se asigno en store (state=>state.conversaciones) y en el sliceConversacion
-    // utilizar el mismo nombre del objeto de initialState (datosConversacion, en este caso)
-    // De esta forma ya se agregaron al estado y se pueden utilizar
-    // NOTA: SE PODRIA OPTIMIZAR ESTA PARTE, POR EL MOMENTO SE DEJARA ASI Y OMITIRA LA ADVERTENCIA EN "App.js -> LogBox.ignoreLogs" CHECAR https://redux.js.org/usage/deriving-data-selectors#optimizing-selectors-with-memoization
-    const conversacionesDelUsuario = useSelector(state => {
-        const datosDeConversaciones = state.conversaciones.datosConversacion;
-        //console.log(datosDeConversaciones);
-        // Los muestra y ordena de acuerdo con la ultima actualzacion de la conversacion
-        return Object.values(datosDeConversaciones).sort((a, b) => {
-            const dateA = new Date(Date.parse(a.actualizadoEn)).getTime();
-            const dateB = new Date(Date.parse(b.actualizadoEn)).getTime();
-            return dateB - dateA;
-        })
-    });
+    const selectConversacionesDelUsuario = createSelector(
+        (state) => state.conversaciones.datosConversacion,
+        (datosDeConversaciones) => {
+            // La función `useMemo()` memoriza el resultado de la función `Object.values()`
+            const conversaciones = useMemo(() => Object.values(datosDeConversaciones), [datosDeConversaciones]);
+            return conversaciones.sort((a, b) => {
+                const dateA = new Date(Date.parse(a.actualizadoEn)).getTime();
+                const dateB = new Date(Date.parse(b.actualizadoEn)).getTime();
+                return dateB - dateA;
+            });
+        }
+    );    
 
+    const conversacionesDelUsuario = useSelector(selectConversacionesDelUsuario);
     //console.log(conversacionesDelUsuario);
 
     // Todo lo que actualiza los botones de navegacion de header
@@ -49,7 +47,10 @@ const ListaConversaciones = props => {
                 </HeaderButtons>
             }
         })
-    }, []);
+    }, [props.route?.params], {
+        effectResettable: false
+    });
+
 
     useEffect(() => {
         if (!usuarioSeleccionado) {
@@ -89,7 +90,7 @@ const ListaConversaciones = props => {
                 const mensajePropio = datosConversacion.actualizadoPor === datosUsuario.idUsuario;
                 const tipoMensaje = mensajePropio ? "mensaje-propio" : "mensaje-otro-usuario";
                 //console.log("tipo Mensaje: " + tipoMensaje);
-                
+
 
                 return <DatosItem
                     titulo={titulo}

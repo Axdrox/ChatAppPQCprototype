@@ -7,7 +7,7 @@ export const obtenerDatosUsuario = async (idUsuario) => {
         const referenciaUsuario = child(referenciaBaseDatos, `usuarios/${idUsuario}`);
         //Snapshot: Obtener datos de Firebase
         const snapshot = await get(referenciaUsuario);
-        console.log(snapshot);
+        //console.log(snapshot);
         return snapshot.val()
     } catch (error) {
         console.log(error);

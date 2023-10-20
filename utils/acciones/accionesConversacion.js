@@ -17,7 +17,7 @@ export const crearConversacion = async (idUsuarioQueInicioSesion, datosConversac
     //En donde se va a realizar la creacion de la conversacion en la base de datos de Firebase, el nodo es 'conversaciones'
     const nuevaConversacion = await push(child(referenciaBaseDatos, 'conversaciones'), newDatosConversacion);
 
-    console.log(nuevaConversacion.key);
+    //console.log(nuevaConversacion.key);
 
     const usuariosDeLaConversacion = newDatosConversacion.usuarios;
     for (let i = 0; i < usuariosDeLaConversacion.length; i++) {
