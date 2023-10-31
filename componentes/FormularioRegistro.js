@@ -74,7 +74,7 @@ const FormularioRegistro = props => {
                 formState.valoresEntrada.nombreUsuario,
                 formState.valoresEntrada.nombre,
                 formState.valoresEntrada.apellido,
-                formState.valoresEntrada.correo,
+                //formState.valoresEntrada.correo,
                 formState.valoresEntrada.contrasenia
             );
             setError(null);
@@ -87,7 +87,7 @@ const FormularioRegistro = props => {
     }, [dispatch, formState]);
 
     return (
-        //Regresar multiples elementoshttps://console.firebase.google.com/u/6/project/chat-app-pqc-prototype/authentication/users?hl=es-419
+        //Regresar multiples elementos
         <>
             <Entrada
                 id="nombreUsuario"

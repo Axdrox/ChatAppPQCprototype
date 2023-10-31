@@ -12,7 +12,7 @@ export const lanzarSelectorImagen = async () => {
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsEditing: true,
         aspect: [1, 1],
-        quality: 0
+        quality: 0 // SE PUEDE PONER EN 1 PARA MAYOR CALIDAD
     });
     if (!resultado.canceled) {
         return resultado.assets[0].uri;

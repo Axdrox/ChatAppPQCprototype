@@ -89,8 +89,6 @@ const ListaConversaciones = props => {
                 // Mensaje actualizado para tener el control de quien fue el ultimo en actualizar el chat
                 const mensajePropio = datosConversacion.actualizadoPor === datosUsuario.idUsuario;
                 const tipoMensaje = mensajePropio ? "mensaje-propio" : "mensaje-otro-usuario";
-                //console.log("tipo Mensaje: " + tipoMensaje);
-
 
                 return <DatosItem
                     titulo={titulo}

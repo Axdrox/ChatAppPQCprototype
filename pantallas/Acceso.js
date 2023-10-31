@@ -11,6 +11,7 @@ import logo from '../assets/imagenes/logo.png'
 
 const Acceso = props => {
     // Variable de estado para cambiar entre formulario de registro y de acceso
+    //estaRegistrado = true;
     const [estaRegistrado, cambiarFormulario] = useState(false);
 
     return <SafeAreaView style={{ flex: 1 }}>
@@ -70,7 +71,7 @@ const styles = StyleSheet.create({
     },
     imagen: {
         width: '45%',
-        resizeMode:'contain',
+        resizeMode: 'contain',
     }
 });
 
