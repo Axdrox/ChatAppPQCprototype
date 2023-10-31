@@ -7,6 +7,7 @@ import DatosItem from '../componentes/DatosItem';
 import ContenedorPagina from '../componentes/ContenedorPagina';
 import TituloPagina from '../componentes/TituloPagina';
 import { createSelector } from '@reduxjs/toolkit';
+import { desencapsularKyber, encapsularKyber, generarClavesKyber } from '../utils/acciones/criptografia';
 
 const ListaConversaciones = props => {
     //Contiene el id de usuario seleccionado si es que existe, si no: undefined
@@ -27,7 +28,7 @@ const ListaConversaciones = props => {
                 return dateB - dateA;
             });
         }
-    );    
+    );
 
     const conversacionesDelUsuario = useSelector(selectConversacionesDelUsuario);
     //console.log(conversacionesDelUsuario);
@@ -68,6 +69,14 @@ const ListaConversaciones = props => {
 
     return <ContenedorPagina>
         <TituloPagina texto="Conversaciones" />
+        <Button
+            title="Generar claves de Kyber"
+            onPress={() => {
+                const clavesKyber = generarClavesKyber();
+                const ciphertext = encapsularKyber(clavesKyber[0]);
+                desencapsularKyber(ciphertext, clavesKyber[1]);
+            }}
+        />
         <FlatList
             data={conversacionesDelUsuario}
             renderItem={(itemData) => {
