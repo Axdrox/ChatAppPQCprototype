@@ -32,6 +32,7 @@ const Conversacion = props => {
             for (const key in datosDelMensajeDeConversacion) {
                 const mensaje = datosDelMensajeDeConversacion[key];
                 mensaje.key = key;
+                console.log(mensaje);
                 listaMensajes.push(mensaje);
             }
             return listaMensajes;
@@ -41,6 +42,14 @@ const Conversacion = props => {
     const mensajesConversacion = useSelector(selectMensajesConversacion);
 
     const idUsuarioPrimerMensaje = (mensajesConversacion.length !== 0) ? mensajesConversacion[0].enviadoPor : "";
+
+    let mensajesEnviadosPrimerUsuario = 0;
+    mensajesConversacion.forEach((id) => {
+        if(idUsuarioPrimerMensaje === id.enviadoPor)
+            mensajesEnviadosPrimerUsuario += 1;
+    });
+
+    
 
     // Si existe un idConversacion, almacena los datos de la conversacion en conversacionesAlmacenadas respecto a ese idConversacion, si no, que sean nuevos datos de conversacion
     const datosConversacion = (idConversacion && conversacionesAlmacenadas[idConversacion]) || props.route?.params?.newDatosConversacion;
@@ -80,12 +89,18 @@ const Conversacion = props => {
             //NOTA: AQUI SE PUEDE UTILIZAR CRIPTOGRAFIA PARA CIFRAR EL MENSAJE
             //await enviarMensajeTexto(idConversacion, datosUsuario.idUsuario, mensajeTexto);
 
-            //Para seguir la logica de generar el establecimiento de clave con la contestacion del usuario que no envio el primer mensaje
-            if(mensajesConversacion.length === 1 && datosUsuario.idUsuario !== idUsuarioPrimerMensaje){
-                await enviarMensajeTexto(id, datosUsuario.idUsuario, mensajeTexto, true);
+            //Para seguir la logica de generar el establecimiento de clave utilizando encapsulacion con la contestacion del usuario que no envio el primer mensaje
+            if (mensajesConversacion.length === 1 && datosUsuario.idUsuario !== idUsuarioPrimerMensaje) {
+                await enviarMensajeTexto(id, datosUsuario.idUsuario, mensajeTexto, true, false);
             }
-            else{
-                await enviarMensajeTexto(id, datosUsuario.idUsuario, mensajeTexto,false);
+            //Para el usuario que genera las claves de Kyber y pueda desencapsular la clave compartida
+            else if (mensajesEnviadosPrimerUsuario === 1 && datosUsuario.idUsuario === idUsuarioPrimerMensaje) {
+                await enviarMensajeTexto(id, datosUsuario.idUsuario, mensajeTexto, false, true);
+            }
+            //Usuario que genera el encapsulado
+            else {
+                console.log("geloooo");
+                await enviarMensajeTexto(id, datosUsuario.idUsuario, mensajeTexto, false, false);
             }
             setMensajeTexto("");
         } catch (error) {
@@ -117,7 +132,7 @@ const Conversacion = props => {
                         <Burbuja texto="Este usuaro quiere conversar, envía un mensaje de vuelta para cifrar la conversación." tipo="sistema" />
                     }
 
-{
+                    {
                         (mensajesConversacion.length === 1 && datosUsuario.idUsuario === idUsuarioPrimerMensaje) &&
                         <Burbuja texto="Espera la constestación del otro usuario para cifrar la conversación." tipo="sistema" />
                     }

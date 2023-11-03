@@ -7,7 +7,10 @@ import DatosItem from '../componentes/DatosItem';
 import ContenedorPagina from '../componentes/ContenedorPagina';
 import TituloPagina from '../componentes/TituloPagina';
 import { createSelector } from '@reduxjs/toolkit';
-import { desencapsularKyber, encapsularKyber, generarClavesKyber } from '../utils/acciones/criptografia';
+
+import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
+
+import CryptoES from 'crypto-es';
 
 const ListaConversaciones = props => {
     //Contiene el id de usuario seleccionado si es que existe, si no: undefined
@@ -70,12 +73,11 @@ const ListaConversaciones = props => {
     return <ContenedorPagina>
         <TituloPagina texto="Conversaciones" />
         <Button
-        //TEST KYBER 
+            //TEST KYBER 
             title="Generar claves de Kyber"
-            onPress={() => {
-                const clavesKyber = generarClavesKyber();
-                const ciphertext = encapsularKyber(clavesKyber[0]);
-                desencapsularKyber(ciphertext, clavesKyber[1]);
+            onPress={async() => {
+                console.log(await ReactNativeAsyncStorage.getAllKeys());
+                console.log(await ReactNativeAsyncStorage.getItem("-NiILnpnQXVNkIIpdGjz"));
             }}
         />
         <FlatList

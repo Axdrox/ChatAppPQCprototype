@@ -1,7 +1,26 @@
 import { child, get, getDatabase, push, ref, set, update } from "firebase/database";
 import { app } from '../firebaseHelper';
-import { encapsularKyber, generarClavesKyber } from "./criptografia";
+import { cifrarConAES, encapsularKyber, generarClaveSimetrica, generarClavesKyber } from "./criptografia";
 import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
+
+const almacenarDatos = async (key, value) => {
+    try {
+        await ReactNativeAsyncStorage.setItem(key, value);
+    } catch (e) {
+        console.log("Error: " + e);
+    }
+};
+
+const obtenerValor = async (key) => {
+    try {
+        const valor = await ReactNativeAsyncStorage.getItem(key);
+        return valor;
+    } catch (e) {
+        console.log("Error: " + e);
+    }
+
+    console.log('Done.')
+}
 
 // AQUI SE PUEDE UTILIZAR CRIPTOGRAFIA PARA LA PARTE DE SUBIR LA CLAVE PUBLICA DE KYBER
 export const crearConversacion = async (idUsuarioQueInicioSesion, datosConversacion) => {
@@ -21,7 +40,8 @@ export const crearConversacion = async (idUsuarioQueInicioSesion, datosConversac
 
     //Llamando el algoritmo de generacion de claves de Kyber
     const clavesKyber = generarClavesKyber();
-    // GUARDAR CLAVE SECRETA!!
+    //Guardando clave secreta de Kyber
+    almacenarDatos(nuevaConversacion.key, clavesKyber[1]);
     const datosClavePublicaKyber = {
         creadoPor: idUsuarioQueInicioSesion,
         KyberClavePublica: clavesKyber[0],
@@ -42,19 +62,14 @@ export const crearConversacion = async (idUsuarioQueInicioSesion, datosConversac
 }
 
 // AQUI SE PUEDE UTILIZAR CRIPTOGRAFIA PARA CIFRAR EL MENSAJE
-export const enviarMensajeTexto = async (idConversacion, idEmisor, mensajeTexto, establecerClave) => {
+export const enviarMensajeTexto = async (idConversacion, idEmisor, mensajeTexto, encapsularClavePublica, desencapsular) => {
     const referenciaBaseDatos = ref(getDatabase(app));
     //La referencia del nodo "mensajes" como se creara en la base de datos
     const referenciaMensajes = child(referenciaBaseDatos, `mensajes/${idConversacion}`);
 
-    const datosMensaje = {
-        enviadoPor: idEmisor,
-        //enviadoEn: new Date().toISOString(),
-        //MENSAJE CIFRADO
-        mensajeTexto: mensajeTexto
-    };
-
-    if (establecerClave === true) {
+    
+    let mensajeCifrado = "";
+    if (encapsularClavePublica === true) {
         //La referencia del nodo "clavePublica" como se creara en la base de datos
         const referenciaClavePublica = child(referenciaBaseDatos, `clavePublica/${idConversacion}`);
         const snapshotKyberClavePublica = await get(referenciaClavePublica);
@@ -62,13 +77,31 @@ export const enviarMensajeTexto = async (idConversacion, idEmisor, mensajeTexto,
         const kyberClavePublica = snapshotKyberClavePublica.val().KyberClavePublica;
 
         //Llamando el algoritmo de encapsulación Kyber con la clave publica recibida
-        const textoCifradoKyber = encapsularKyber(kyberClavePublica)[0];
-        // GUARDAR CLAVE COMPARTIDA!!
-        //Actualizando el valor del textocifrado en la base de datos
+        const clavesKyber = encapsularKyber(kyberClavePublica);
+        const textoCifradoKyber = clavesKyber[0];
+        //Actualizando el valor del textocifrado de Kyber en la base de datos
         await update(referenciaClavePublica, {
             KyberTextoCifrado: textoCifradoKyber
         });
+
+        //Generando clave simetrica
+        const stringEntradaSal = "P" + snapshotKyberClavePublica.val().creadoPor + "q" + idEmisor + "C";
+        const claveSimetrica = generarClaveSimetrica(stringEntradaSal, clavesKyber[1]);
+        almacenarDatos(idConversacion, claveSimetrica);
+
+        //Cifrar mensaje
+        let fecha = new Date;
+        const stringEntradaIV = "A" + fecha.getMonth() + "L" + idEmisor + fecha.getFullYear() + "E";
+        mensajeCifrado = cifrarConAES(mensajeTexto, stringEntradaIV, claveSimetrica);    
+
     }
+
+    const datosMensaje = {
+        enviadoPor: idEmisor,
+        //enviadoEn: new Date().toISOString(),
+        //MENSAJE CIFRADO
+        mensajeTexto: mensajeCifrado
+    };
 
     await push(referenciaMensajes, datosMensaje);
 
