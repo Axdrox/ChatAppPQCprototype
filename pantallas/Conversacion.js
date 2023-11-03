@@ -22,25 +22,25 @@ const Conversacion = props => {
     const datosUsuario = useSelector(state => state.autenticacion.datosUsuario);
     const usuariosAlmacenados = useSelector(state => state.usuarios.usuariosAlmacenados);
     const conversacionesAlmacenadas = useSelector(state => state.conversaciones.datosConversacion);
+
     // PODRIA OCUPARSE CRIPTOGRAFIA PARA DESCIFRAR MENSAJES
-    
     const selectMensajesConversacion = createSelector(
         state => state.mensajes.datosMensajes[idConversacion],
         (datosDelMensajeDeConversacion) => {
-          const listaMensajes = [];
-      
-          for (const key in datosDelMensajeDeConversacion) {
-            const mensaje = datosDelMensajeDeConversacion[key];
-            mensaje.key = key;
-            listaMensajes.push(mensaje);
-          }
-          return listaMensajes;
+            const listaMensajes = [];
+
+            for (const key in datosDelMensajeDeConversacion) {
+                const mensaje = datosDelMensajeDeConversacion[key];
+                mensaje.key = key;
+                listaMensajes.push(mensaje);
+            }
+            return listaMensajes;
         }
-      );
+    );
 
-      const mensajesConversacion = useSelector(selectMensajesConversacion);
+    const mensajesConversacion = useSelector(selectMensajesConversacion);
 
-    //    console.log(mensajesConversacion);
+    const idUsuarioPrimerMensaje = (mensajesConversacion.length !== 0) ? mensajesConversacion[0].enviadoPor : "";
 
     // Si existe un idConversacion, almacena los datos de la conversacion en conversacionesAlmacenadas respecto a ese idConversacion, si no, que sean nuevos datos de conversacion
     const datosConversacion = (idConversacion && conversacionesAlmacenadas[idConversacion]) || props.route?.params?.newDatosConversacion;
@@ -79,8 +79,14 @@ const Conversacion = props => {
             //Logica para crear el mensaje y mandarlo a la base de datos en Firebase
             //NOTA: AQUI SE PUEDE UTILIZAR CRIPTOGRAFIA PARA CIFRAR EL MENSAJE
             //await enviarMensajeTexto(idConversacion, datosUsuario.idUsuario, mensajeTexto);
-            await enviarMensajeTexto(id, datosUsuario.idUsuario, mensajeTexto);
 
+            //Para seguir la logica de generar el establecimiento de clave con la contestacion del usuario que no envio el primer mensaje
+            if(mensajesConversacion.length === 1 && datosUsuario.idUsuario !== idUsuarioPrimerMensaje){
+                await enviarMensajeTexto(id, datosUsuario.idUsuario, mensajeTexto, true);
+            }
+            else{
+                await enviarMensajeTexto(id, datosUsuario.idUsuario, mensajeTexto,false);
+            }
             setMensajeTexto("");
         } catch (error) {
             console.log(error);
@@ -104,6 +110,16 @@ const Conversacion = props => {
 
                     {
                         bannerDeError !== "" && <Burbuja texto={bannerDeError} tipo="sistema-error" />
+                    }
+
+                    {
+                        (mensajesConversacion.length === 1 && datosUsuario.idUsuario !== idUsuarioPrimerMensaje) &&
+                        <Burbuja texto="Este usuaro quiere conversar, envía un mensaje de vuelta para cifrar la conversación." tipo="sistema" />
+                    }
+
+{
+                        (mensajesConversacion.length === 1 && datosUsuario.idUsuario === idUsuarioPrimerMensaje) &&
+                        <Burbuja texto="Espera la constestación del otro usuario para cifrar la conversación." tipo="sistema" />
                     }
 
                     {
@@ -139,9 +155,9 @@ const Conversacion = props => {
                     onSubmitEditing={enviarMensaje} />
 
                 {
-                    //Para desactivar el boton de enviar si no se ha escrito nada
-                    mensajeTexto === "" &&
-                    <TouchableOpacity disabled={true}
+                    //Para desactivar el boton de enviar si no se ha escrito nada y el usuario que envia el primer mensaje 
+                    (mensajeTexto === "" || (mensajesConversacion.length === 1 && datosUsuario.idUsuario === idUsuarioPrimerMensaje)) &&
+                    < TouchableOpacity disabled={true}
                         style={styles.botonEnviar}>
                         <MaterialCommunityIcons name="send-circle-outline" size={35} color={colores.periwinkle} />
                     </TouchableOpacity>
@@ -149,7 +165,7 @@ const Conversacion = props => {
 
                 {
                     //Para activar el boton de enviar si se escribe algo
-                    mensajeTexto !== "" &&
+                    (mensajeTexto !== "" && (mensajesConversacion.length != 1 || (mensajesConversacion.length === 1 && datosUsuario.idUsuario !== idUsuarioPrimerMensaje))) &&
                     <TouchableOpacity disabled={false}
                         style={styles.botonEnviar}
                         onPress={enviarMensaje}>
@@ -158,7 +174,7 @@ const Conversacion = props => {
                 }
 
             </View>
-        </SafeAreaView>
+        </SafeAreaView >
     )
 };
 

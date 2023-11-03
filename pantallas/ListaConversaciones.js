@@ -70,6 +70,7 @@ const ListaConversaciones = props => {
     return <ContenedorPagina>
         <TituloPagina texto="Conversaciones" />
         <Button
+        //TEST KYBER 
             title="Generar claves de Kyber"
             onPress={() => {
                 const clavesKyber = generarClavesKyber();

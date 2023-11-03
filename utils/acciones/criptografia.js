@@ -33,9 +33,7 @@ export const encapsularKyber = (pk) => {
     const c_base64 = Buffer.from(c).toString('base64');
     const ss1_base64 = Buffer.from(ss1).toString('base64');
 
-    console.log(ss1_base64);
-
-    return c_base64;
+    return [c_base64, ss1_base64];
 }
 
 export const desencapsularKyber = (c, sk) => {

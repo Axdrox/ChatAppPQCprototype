@@ -19,7 +19,7 @@ export const buscarUsuarios = async (textoQuery) => {
     try {
         const referenciaBaseDatos = ref(getDatabase(app));
         const referenciaUsuario = child(referenciaBaseDatos, 'usuarios');
-        //                                               Restricciones para poder realizar busqueda en Firebase
+        //Restricciones para poder realizar busqueda en Firebase
         const referenciaQuery = query(referenciaUsuario, orderByChild('nombreUsuario'), startAt(terminoBusqueda), endAt(terminoBusqueda + "\uf8ff"));
 
         //Ejecutando Query
