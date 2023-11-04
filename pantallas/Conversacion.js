@@ -14,7 +14,7 @@ import { createSelector } from '@reduxjs/toolkit';
 const Conversacion = props => {
     //Variables de estado
     const [conversacionUsuarios, setConversacionUsuarios] = useState([]);
-    const [mensajeTexto, setMensajeTexto] = useState("");
+    const [mensajeTexto, setMensajeTexto] = useState("Invitación para conversar");
     const [idConversacion, setIdConversacion] = useState(props.route?.params?.idConversacion);
     //Para mostrar un error en caso de que exista
     const [bannerDeError, setBannerDeError] = useState("");
@@ -32,7 +32,8 @@ const Conversacion = props => {
             for (const key in datosDelMensajeDeConversacion) {
                 const mensaje = datosDelMensajeDeConversacion[key];
                 mensaje.key = key;
-                console.log(mensaje);
+                //console.log(mensaje);
+                //GUARDAR LOS MENSAJES DESCIFRADOS!!!!
                 listaMensajes.push(mensaje);
             }
             return listaMensajes;
@@ -45,11 +46,9 @@ const Conversacion = props => {
 
     let mensajesEnviadosPrimerUsuario = 0;
     mensajesConversacion.forEach((id) => {
-        if(idUsuarioPrimerMensaje === id.enviadoPor)
+        if (idUsuarioPrimerMensaje === id.enviadoPor)
             mensajesEnviadosPrimerUsuario += 1;
     });
-
-    
 
     // Si existe un idConversacion, almacena los datos de la conversacion en conversacionesAlmacenadas respecto a ese idConversacion, si no, que sean nuevos datos de conversacion
     const datosConversacion = (idConversacion && conversacionesAlmacenadas[idConversacion]) || props.route?.params?.newDatosConversacion;
@@ -78,28 +77,30 @@ const Conversacion = props => {
         try {
             let id = idConversacion;
             if (!id) {
-                // Si no existe un id de conversacion (es nueva la conversacion)
-                // crear conversacion a partir del primer mensaje enviado
-                // NOTA: AQUI SE PUEDE UTILIZAR CRIPTOGRAFIA PARA LA PARTE DE SUBIR LA CLAVE PUBLICA DE KYBER
+                // Si no existe un id de conversacion (la conversacion es nueva)
+                // se crea la conversacion a partir del primer mensaje enviado
+                // NOTA: SE PUBLICA LA CLAVE PUBLICA DE KYBER DE QUIEN CREA LA CONVERSACION
                 id = await crearConversacion(datosUsuario.idUsuario, props.route.params.newDatosConversacion);
                 setIdConversacion(id);
             }
-
-            //Logica para crear el mensaje y mandarlo a la base de datos en Firebase
-            //NOTA: AQUI SE PUEDE UTILIZAR CRIPTOGRAFIA PARA CIFRAR EL MENSAJE
-            //await enviarMensajeTexto(idConversacion, datosUsuario.idUsuario, mensajeTexto);
-
-            //Para seguir la logica de generar el establecimiento de clave utilizando encapsulacion con la contestacion del usuario que no envio el primer mensaje
-            if (mensajesConversacion.length === 1 && datosUsuario.idUsuario !== idUsuarioPrimerMensaje) {
+            //Invitacion para conversar
+            if (mensajesConversacion.length === 0) {
+                await enviarMensajeTexto(id, datosUsuario.idUsuario, mensajeTexto, false, false);
+            }
+            //Para ejecutar el algoritmo de encapsulado (Usuario que no crea la conversacion/que no envia el primer mensaje)
+            else if (mensajesConversacion.length === 1 && datosUsuario.idUsuario !== idUsuarioPrimerMensaje) {
                 await enviarMensajeTexto(id, datosUsuario.idUsuario, mensajeTexto, true, false);
             }
-            //Para el usuario que genera las claves de Kyber y pueda desencapsular la clave compartida
+            //Para que siga cifrando el usuario que ya encapsulo y genero su clave simetrica
+            else if (mensajesConversacion.length > 1 && datosUsuario.idUsuario !== idUsuarioPrimerMensaje) {
+                await enviarMensajeTexto(id, datosUsuario.idUsuario, mensajeTexto, false, false);
+            }
+            //Para ejecutar el algoritmo de desencapsulacion (Usuario que genera las claves de Kyber/inicia la conversación)
             else if (mensajesEnviadosPrimerUsuario === 1 && datosUsuario.idUsuario === idUsuarioPrimerMensaje) {
                 await enviarMensajeTexto(id, datosUsuario.idUsuario, mensajeTexto, false, true);
             }
-            //Usuario que genera el encapsulado
-            else {
-                console.log("geloooo");
+            //Para que siga cifrando el usuario que ya desencapsulo y genero su clave simetrica
+            else if (mensajesEnviadosPrimerUsuario > 1 && datosUsuario.idUsuario === idUsuarioPrimerMensaje) {
                 await enviarMensajeTexto(id, datosUsuario.idUsuario, mensajeTexto, false, false);
             }
             setMensajeTexto("");
@@ -129,12 +130,12 @@ const Conversacion = props => {
 
                     {
                         (mensajesConversacion.length === 1 && datosUsuario.idUsuario !== idUsuarioPrimerMensaje) &&
-                        <Burbuja texto="Este usuaro quiere conversar, envía un mensaje de vuelta para cifrar la conversación." tipo="sistema" />
+                        <Burbuja texto="Este usuaro quiere conversar, envía un mensaje de vuelta para conversar." tipo="sistema" />
                     }
 
                     {
                         (mensajesConversacion.length === 1 && datosUsuario.idUsuario === idUsuarioPrimerMensaje) &&
-                        <Burbuja texto="Espera la constestación del otro usuario para cifrar la conversación." tipo="sistema" />
+                        <Burbuja texto="Espera la constestación del otro usuario." tipo="sistema" />
                     }
 
                     {
@@ -163,11 +164,20 @@ const Conversacion = props => {
             </ImageBackground>
             <View style={styles.contenedorEntrada}>
 
-                <TextInput
-                    style={styles.cajaTexto}
-                    value={mensajeTexto}
-                    onChangeText={text => setMensajeTexto(text)}
-                    onSubmitEditing={enviarMensaje} />
+                {
+                    (mensajesConversacion.length === 0) ?
+                        <TextInput
+                            style={{ ...styles.cajaTexto, color: 'black' }}
+                            value={mensajeTexto}
+                            onSubmitEditing={enviarMensaje}
+                            editable={false} /> :
+                        <TextInput
+                            style={styles.cajaTexto}
+                            value={mensajeTexto}
+                            onChangeText={text => setMensajeTexto(text)}
+                            onSubmitEditing={enviarMensaje}
+                            placeholder='Mensaje...' />
+                }
 
                 {
                     //Para desactivar el boton de enviar si no se ha escrito nada y el usuario que envia el primer mensaje 

@@ -46,7 +46,7 @@ export const desencapsularKyber = (c, sk) => {
 
     const ss2_base64 = Buffer.from(ss2).toString('base64');
 
-    console.log(ss2_base64);
+    return ss2_base64;
 }
 
 export const generarClaveSimetrica = (entradaSal, claveCompartida) => {
@@ -61,4 +61,11 @@ export const cifrarConAES = (textoClaro, entradaIV, claveSimetrica) => {
     const wordsClaveSimetrica = CryptoES.enc.Base64.parse(claveSimetrica);
     const iv = CryptoES.SHA3(entradaIV, { outputLength: 256 });
     return CryptoES.AES.encrypt(textoClaro, wordsClaveSimetrica, { iv: iv, mode: CryptoES.mode.CTR }).ciphertext.toString(CryptoES.enc.Base64);
+}
+
+export const descifrarConAES = (textoCifrado, entradaIV, claveSimetrica) => {
+    const wordsTextoCifrado = CryptoES.enc.Base64.parse(textoCifrado);
+    const iv = CryptoES.SHA3(entradaIV, { outputLength: 256 });
+    const wordsClaveSimetrica = CryptoES.enc.Base64.parse(claveSimetrica);
+    return CryptoES.AES.decrypt({ ciphertext: wordsTextoCifrado }, wordsClaveSimetrica, { iv: iv, mode: CryptoES.mode.CBC }).toString(CryptoES.enc.Utf8);
 }

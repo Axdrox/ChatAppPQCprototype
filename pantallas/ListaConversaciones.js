@@ -74,10 +74,11 @@ const ListaConversaciones = props => {
         <TituloPagina texto="Conversaciones" />
         <Button
             //TEST KYBER 
-            title="Generar claves de Kyber"
+            title="Ver clave guardada"
             onPress={async() => {
                 console.log(await ReactNativeAsyncStorage.getAllKeys());
-                console.log(await ReactNativeAsyncStorage.getItem("-NiILnpnQXVNkIIpdGjz"));
+                console.log(await ReactNativeAsyncStorage.getItem("-NiNp2jWvqueiNVQpBCG"));
+                console.log(await ReactNativeAsyncStorage.getAllKeys());
             }}
         />
         <FlatList
