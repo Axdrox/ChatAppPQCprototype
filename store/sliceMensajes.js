@@ -1,4 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { descifrarConAES } from "../utils/acciones/criptografia";
 /*Logica de reductor
 1. InicialState: el estado en el que se encuentra antes de realizar algo
 2. Funciones: utilizadas para actualizar 
@@ -12,9 +13,21 @@ const sliceMensajes = createSlice({
         setMensajesConversacion: (state, action) => {
             const mensajesExistentes = state.datosMensajes;
 
-            const { idConversacion, datosMensajes } = action.payload;
+            // Se recibe un objeto JSON (llaves: idConversacion, datos mensajes; valores: idConversacion, todos los mensajes)
+            const { idConversacion, datosMensajes, claveSimetrica } = action.payload;
 
             mensajesExistentes[idConversacion] = datosMensajes
+
+            //Descifrar mensaje
+            let mensajeTextoPlano = "";
+            let fecha = new Date;
+            const stringEntradaIV = "A" + fecha.getMonth() + idConversacion + "L" + fecha.getFullYear() + "E";
+            for (const key in datosMensajes) {
+                if (claveSimetrica != null) {
+                    mensajeTextoPlano = descifrarConAES(datosMensajes[key].mensajeTexto, stringEntradaIV, claveSimetrica);
+                    datosMensajes[key].mensajeTexto = mensajeTextoPlano
+                }
+            }
 
             state.datosMensajes = mensajesExistentes;
         }

@@ -77,8 +77,8 @@ const ListaConversaciones = props => {
             title="Ver clave guardada"
             onPress={async() => {
                 console.log(await ReactNativeAsyncStorage.getAllKeys());
-                console.log(await ReactNativeAsyncStorage.getItem("-NiNp2jWvqueiNVQpBCG"));
-                console.log(await ReactNativeAsyncStorage.getAllKeys());
+                console.log(await ReactNativeAsyncStorage.removeItem("datosUsuario"));
+                //console.log(await ReactNativeAsyncStorage.getAllKeys());
             }}
         />
         <FlatList

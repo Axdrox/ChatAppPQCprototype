@@ -3,18 +3,18 @@ import { app } from '../firebaseHelper';
 import { cifrarConAES, desencapsularKyber, encapsularKyber, generarClaveSimetrica, generarClavesKyber } from "./criptografia";
 import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
 
-const almacenarDatos = async (key, value) => {
+const almacenarDatos = async (prefix, key, value) => {
     try {
-        await ReactNativeAsyncStorage.setItem(key, value);
+        await ReactNativeAsyncStorage.setItem(prefix + key, value);
     } catch (e) {
         console.log("Error al almacenar datos: " + e);
     }
     console.log('Se almacenaron los datos correctamente.')
 };
 
-const obtenerValor = async (key) => {
+const obtenerValor = async (prefix, key) => {
     try {
-        const valor = await ReactNativeAsyncStorage.getItem(key);
+        const valor = await ReactNativeAsyncStorage.getItem(prefix + key);
         return valor;
     } catch (e) {
         console.log("Error al obtener datos: " + e);
@@ -22,9 +22,9 @@ const obtenerValor = async (key) => {
     console.log('Se obtuvieron los datos correctamente.')
 }
 
-const removerDatos = async (key) => {
+const removerDatos = async (prefix, key) => {
     try {
-        await AsyncStorage.removeItem(key)
+        await ReactNativeAsyncStorage.removeItem(prefix + key)
     } catch (e) {
         console.log("Error al remover datos: " + e);
     }
@@ -50,7 +50,7 @@ export const crearConversacion = async (idUsuarioQueInicioSesion, datosConversac
     //Llamando el algoritmo de generacion de claves de Kyber
     const clavesKyber = generarClavesKyber();
     //Guardando clave secreta de Kyber
-    almacenarDatos(nuevaConversacion.key, clavesKyber[1]);
+    almacenarDatos("sk", nuevaConversacion.key, clavesKyber[1]);
     const datosClavePublicaKyber = {
         creadoPor: idUsuarioQueInicioSesion,
         KyberClavePublica: clavesKyber[0],
@@ -71,7 +71,7 @@ export const crearConversacion = async (idUsuarioQueInicioSesion, datosConversac
 }
 
 // PARA CIFRAR EL MENSAJE
-export const enviarMensajeTexto = async (idConversacion, idEmisor, mensaje, ejecutarEncapsular, ejecutarDesencapsular) => {
+export const enviarMensajeTexto = async (idConversacion, idEmisor, mensaje, ejecutarEncapsular, ejecutarDesencapsular, peticionConversar) => {
     const referenciaBaseDatos = ref(getDatabase(app));
     //La referencia del nodo "mensajes" como se creara en la base de datos
     const referenciaMensajes = child(referenciaBaseDatos, `mensajes/${idConversacion}`);
@@ -80,13 +80,16 @@ export const enviarMensajeTexto = async (idConversacion, idEmisor, mensaje, ejec
     let mensajeCifrado = "";
     if (ejecutarEncapsular === true)
         mensajeCifrado = (await encapsular(referenciaBaseDatos, idConversacion, mensaje)).toString();
-    if (ejecutarDesencapsular === true){
-        mensajeCifrado = (await desencapsular(referenciaBaseDatos, idConversacion, mensaje)).toString();
-        console.log(mensajeCifrado);
-    }
-        
 
-    if (ejecutarEncapsular === false && ejecutarDesencapsular === false) {
+    if (ejecutarDesencapsular === true)
+        mensajeCifrado = (await desencapsular(referenciaBaseDatos, idConversacion, mensaje)).toString();
+
+    if (ejecutarEncapsular === false && ejecutarDesencapsular === false && peticionConversar === false) {
+        let claveSimetrica = await obtenerValor("smk", idConversacion);
+        mensajeCifrado = cifrarMensaje(mensaje, claveSimetrica, idConversacion);
+    }
+
+    if (ejecutarEncapsular === false && ejecutarDesencapsular === false && peticionConversar === true) {
         datosMensaje = {
             enviadoPor: idEmisor,
             //Primer mensaje en claro
@@ -128,15 +131,10 @@ const encapsular = async (referenciaBaseDatos, idConversacion, mensajeTextoPlano
     //Generando clave simetrica
     const stringEntradaSal = "P" + snapshotKyberClavePublica.val().creadoPor + "q" + "C";
     const claveSimetrica = generarClaveSimetrica(stringEntradaSal, clavesKyber[1]);
-    console.log("CLAVE SIMETRICA ENCAPSULADO: " + claveSimetrica);
-    await almacenarDatos(idConversacion, claveSimetrica);
+    //console.log("CLAVE SIMETRICA ENCAPSULADO: " + claveSimetrica);
+    await almacenarDatos("smk", idConversacion, claveSimetrica);
 
-    //Cifrar mensaje
-    let fecha = new Date;
-    const stringEntradaIV = "A" + fecha.getMonth() + "L" + fecha.getFullYear() + "E";
-    const mensajeCifrado = cifrarConAES(mensajeTextoPlano, stringEntradaIV, claveSimetrica);
-    console.log("Mensaje cifrado: " + mensajeCifrado);
-    return mensajeCifrado;
+    return cifrarMensaje(mensajeTextoPlano, claveSimetrica, idConversacion);
 }
 
 const desencapsular = async (referenciaBaseDatos, idConversacion, mensajeTextoPlano) => {
@@ -145,9 +143,9 @@ const desencapsular = async (referenciaBaseDatos, idConversacion, mensajeTextoPl
     const snapshotClavePublica = await get(referenciaClavePublica);
     //Obteniendo el texto cifrado de Kyber del objeto que regresa firebase
     const kyberTextoCifrado = snapshotClavePublica.val().KyberTextoCifrado;
-    
+
     //Obteniendo la clave secreta de async storage
-    const claveSecreta = await obtenerValor(idConversacion);
+    const claveSecreta = await obtenerValor("sk", idConversacion);
 
     //Llamando el algoritmo de desencapsulación Kyber utilizando el texto cifrado de Kyber recibido
     const claveCompartida = desencapsularKyber(kyberTextoCifrado, claveSecreta);
@@ -155,19 +153,24 @@ const desencapsular = async (referenciaBaseDatos, idConversacion, mensajeTextoPl
     //Generando clave simetrica
     const stringEntradaSal = "P" + snapshotClavePublica.val().creadoPor + "q" + "C";
     const claveSimetrica = generarClaveSimetrica(stringEntradaSal, claveCompartida);
-    console.log("CLAVE SIMETRICA DESENCAPSULADO: " + claveSimetrica);
+    //console.log("CLAVE SIMETRICA DESENCAPSULADO: " + claveSimetrica);
 
     //Removiendo la clave secreta de async storage
-    await removerDatos(idConversacion);
-    //Almacenando la clave secreta
-    await almacenarDatos(idConversacion, claveSimetrica);
+    await removerDatos("sk", idConversacion);
+    //Almacenando la clave simetrica
+    await almacenarDatos("smk", idConversacion, claveSimetrica);
 
+    return cifrarMensaje(mensajeTextoPlano, claveSimetrica, idConversacion);
+}
+
+const cifrarMensaje = (mensajeTextoPlano, claveSimetrica, idConversacion) => {
     //Cifrar mensaje
     let fecha = new Date;
-    const stringEntradaIV = "A" + fecha.getMonth() + "L" + fecha.getFullYear() + "E";
+    const stringEntradaIV = "A" + fecha.getMonth() + idConversacion + "L" + fecha.getFullYear() + "E";
     return cifrarConAES(mensajeTextoPlano, stringEntradaIV, claveSimetrica);
 }
 
+
 const delay = ms => new Promise(
     resolve => setTimeout(resolve, ms)
-  );
+);

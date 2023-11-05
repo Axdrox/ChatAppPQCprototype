@@ -74,7 +74,7 @@ const FormularioRegistro = props => {
                 formState.valoresEntrada.nombreUsuario,
                 formState.valoresEntrada.nombre,
                 formState.valoresEntrada.apellido,
-                //formState.valoresEntrada.correo,
+                formState.valoresEntrada.correo,
                 formState.valoresEntrada.contrasenia
             );
             setError(null);

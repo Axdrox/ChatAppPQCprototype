@@ -105,7 +105,7 @@ export const autorizarAcceso = (correo, contrasenia) => {
 
 export const terminarSesion = () => {
     return async dispatch => {
-        ReactNativeAsyncStorage.clear();
+        ReactNativeAsyncStorage.removeItem("datosUsuario");
         clearTimeout(temporizador);
         dispatch(cerrarSesion());
     }

@@ -67,5 +67,5 @@ export const descifrarConAES = (textoCifrado, entradaIV, claveSimetrica) => {
     const wordsTextoCifrado = CryptoES.enc.Base64.parse(textoCifrado);
     const iv = CryptoES.SHA3(entradaIV, { outputLength: 256 });
     const wordsClaveSimetrica = CryptoES.enc.Base64.parse(claveSimetrica);
-    return CryptoES.AES.decrypt({ ciphertext: wordsTextoCifrado }, wordsClaveSimetrica, { iv: iv, mode: CryptoES.mode.CBC }).toString(CryptoES.enc.Utf8);
+    return CryptoES.AES.decrypt({ ciphertext: wordsTextoCifrado }, wordsClaveSimetrica, { iv: iv, mode: CryptoES.mode.CTR }).toString(CryptoES.enc.Utf8);
 }

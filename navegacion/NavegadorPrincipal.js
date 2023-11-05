@@ -8,6 +8,7 @@ import { FontAwesome5 } from '@expo/vector-icons';
 import { useDispatch, useSelector } from "react-redux";
 import { child, get, getDatabase, off, onValue, ref } from "firebase/database";
 import app from "../utils/firebaseHelper";
+import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
 
 //Locales
 import ListaConversaciones from '../pantallas/ListaConversaciones';
@@ -21,6 +22,16 @@ import estilos from "../constantes/estilos";
 import { setUsuariosAlmacenados } from "../store/sliceUsuario";
 import { setMensajesConversacion } from "../store/sliceMensajes";
 
+
+const obtenerValor = async (prefix, key) => {
+    try {
+        const valor = await ReactNativeAsyncStorage.getItem(prefix + key);
+        return valor;
+    } catch (e) {
+        console.log("Error al obtener datos: " + e);
+    }
+    console.log('Se obtuvieron los datos correctamente.')
+}
 
 //React Navigator
 //const Stack = createStackNavigator();//StackAPI
@@ -142,9 +153,10 @@ const NavegadorPrincipal = props => {
                 const referenciaMensajes = child(referenciaBaseDatos, `mensajes/${idConversacion}`);
                 referencias.push(referenciaMensajes);
 
-                onValue(referenciaMensajes, snapshotMensajes => {
+                onValue(referenciaMensajes, async snapshotMensajes => {
                     const datosMensajes = snapshotMensajes.val();
-                    dispatch(setMensajesConversacion({ idConversacion, datosMensajes }));
+                    const claveSimetrica = await obtenerValor("smk", idConversacion);
+                    dispatch(setMensajesConversacion({ idConversacion, datosMensajes, claveSimetrica }));
                 })
 
                 if (contadorDeConversacionesEncontradas == 0) {

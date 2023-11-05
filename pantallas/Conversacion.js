@@ -14,7 +14,7 @@ import { createSelector } from '@reduxjs/toolkit';
 const Conversacion = props => {
     //Variables de estado
     const [conversacionUsuarios, setConversacionUsuarios] = useState([]);
-    const [mensajeTexto, setMensajeTexto] = useState("Invitación para conversar");
+    const [mensajeTexto, setMensajeTexto] = useState("");
     const [idConversacion, setIdConversacion] = useState(props.route?.params?.idConversacion);
     //Para mostrar un error en caso de que exista
     const [bannerDeError, setBannerDeError] = useState("");
@@ -28,8 +28,8 @@ const Conversacion = props => {
         state => state.mensajes.datosMensajes[idConversacion],
         (datosDelMensajeDeConversacion) => {
             const listaMensajes = [];
-
             for (const key in datosDelMensajeDeConversacion) {
+                //console.log(datosDelMensajeDeConversacion[key].mensajeTexto);
                 const mensaje = datosDelMensajeDeConversacion[key];
                 mensaje.key = key;
                 //console.log(mensaje);
@@ -42,6 +42,12 @@ const Conversacion = props => {
 
     const mensajesConversacion = useSelector(selectMensajesConversacion);
 
+    // Para que el primer mensaje que se envíe sea una invitación a conversar
+    if (mensajesConversacion.length === 0 && mensajeTexto === "") {
+        setMensajeTexto("Invitación para conversar");
+    }
+
+    // Para saber quién fue el usuario que envió el primer mensaje
     const idUsuarioPrimerMensaje = (mensajesConversacion.length !== 0) ? mensajesConversacion[0].enviadoPor : "";
 
     let mensajesEnviadosPrimerUsuario = 0;
@@ -85,23 +91,23 @@ const Conversacion = props => {
             }
             //Invitacion para conversar
             if (mensajesConversacion.length === 0) {
-                await enviarMensajeTexto(id, datosUsuario.idUsuario, mensajeTexto, false, false);
+                await enviarMensajeTexto(id, datosUsuario.idUsuario, mensajeTexto, false, false, true);
             }
             //Para ejecutar el algoritmo de encapsulado (Usuario que no crea la conversacion/que no envia el primer mensaje)
             else if (mensajesConversacion.length === 1 && datosUsuario.idUsuario !== idUsuarioPrimerMensaje) {
-                await enviarMensajeTexto(id, datosUsuario.idUsuario, mensajeTexto, true, false);
+                await enviarMensajeTexto(id, datosUsuario.idUsuario, mensajeTexto, true, false, false);
             }
             //Para que siga cifrando el usuario que ya encapsulo y genero su clave simetrica
             else if (mensajesConversacion.length > 1 && datosUsuario.idUsuario !== idUsuarioPrimerMensaje) {
-                await enviarMensajeTexto(id, datosUsuario.idUsuario, mensajeTexto, false, false);
+                await enviarMensajeTexto(id, datosUsuario.idUsuario, mensajeTexto, false, false, false);
             }
             //Para ejecutar el algoritmo de desencapsulacion (Usuario que genera las claves de Kyber/inicia la conversación)
             else if (mensajesEnviadosPrimerUsuario === 1 && datosUsuario.idUsuario === idUsuarioPrimerMensaje) {
-                await enviarMensajeTexto(id, datosUsuario.idUsuario, mensajeTexto, false, true);
+                await enviarMensajeTexto(id, datosUsuario.idUsuario, mensajeTexto, false, true, false);
             }
             //Para que siga cifrando el usuario que ya desencapsulo y genero su clave simetrica
             else if (mensajesEnviadosPrimerUsuario > 1 && datosUsuario.idUsuario === idUsuarioPrimerMensaje) {
-                await enviarMensajeTexto(id, datosUsuario.idUsuario, mensajeTexto, false, false);
+                await enviarMensajeTexto(id, datosUsuario.idUsuario, mensajeTexto, false, false, false);
             }
             setMensajeTexto("");
         } catch (error) {
