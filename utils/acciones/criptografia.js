@@ -50,7 +50,7 @@ export const desencapsularKyber = (c, sk) => {
 }
 
 export const generarClaveSimetrica = (entradaSal, claveCompartida) => {
-    const salt = CryptoES.SHA3(entradaSal, { outputLength: 256 });
+    const salt = CryptoES.MD5(entradaSal);
     const claveEntrada = CryptoES.enc.Base64.parse(claveCompartida);
     //Para guardarlo en async storage
     const key128Bits = CryptoES.PBKDF2(claveEntrada, salt, { keySize: 128 / 32 }).toString(CryptoES.enc.Base64);
@@ -59,13 +59,13 @@ export const generarClaveSimetrica = (entradaSal, claveCompartida) => {
 
 export const cifrarConAES = (textoClaro, entradaIV, claveSimetrica) => {
     const wordsClaveSimetrica = CryptoES.enc.Base64.parse(claveSimetrica);
-    const iv = CryptoES.SHA3(entradaIV, { outputLength: 256 });
+    const iv = CryptoES.MD5(entradaIV);
     return CryptoES.AES.encrypt(textoClaro, wordsClaveSimetrica, { iv: iv, mode: CryptoES.mode.CTR }).ciphertext.toString(CryptoES.enc.Base64);
 }
 
 export const descifrarConAES = (textoCifrado, entradaIV, claveSimetrica) => {
     const wordsTextoCifrado = CryptoES.enc.Base64.parse(textoCifrado);
-    const iv = CryptoES.SHA3(entradaIV, { outputLength: 256 });
+    const iv = CryptoES.MD5(entradaIV);
     const wordsClaveSimetrica = CryptoES.enc.Base64.parse(claveSimetrica);
     return CryptoES.AES.decrypt({ ciphertext: wordsTextoCifrado }, wordsClaveSimetrica, { iv: iv, mode: CryptoES.mode.CTR }).toString(CryptoES.enc.Utf8);
 }

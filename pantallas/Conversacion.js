@@ -145,6 +145,11 @@ const Conversacion = props => {
                     }
 
                     {
+                        (mensajesEnviadosPrimerUsuario === 1 && mensajesConversacion.length >= 2 && datosUsuario.idUsuario === idUsuarioPrimerMensaje) &&
+                        <Burbuja texto="Envía otro mensaje para descifrar los mensajes." tipo="sistema" />
+                    }
+
+                    {
                         // AQUI SE PODRIA UTILIZAR CRIPTO PARA DESCIFRAR LOS MENSAJES
                         idConversacion &&
                         <FlatList

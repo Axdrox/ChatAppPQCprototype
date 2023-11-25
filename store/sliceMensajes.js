@@ -20,8 +20,7 @@ const sliceMensajes = createSlice({
 
             //Descifrar mensaje
             let mensajeTextoPlano = "";
-            let fecha = new Date;
-            const stringEntradaIV = "A" + fecha.getMonth() + idConversacion + "L" + fecha.getFullYear() + "E";
+            const stringEntradaIV = "P" + idConversacion + "Q" + "C";
             for (const key in datosMensajes) {
                 if (claveSimetrica != null) {
                     mensajeTextoPlano = descifrarConAES(datosMensajes[key].mensajeTexto, stringEntradaIV, claveSimetrica);

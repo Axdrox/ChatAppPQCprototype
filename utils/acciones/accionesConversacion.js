@@ -165,8 +165,7 @@ const desencapsular = async (referenciaBaseDatos, idConversacion, mensajeTextoPl
 
 const cifrarMensaje = (mensajeTextoPlano, claveSimetrica, idConversacion) => {
     //Cifrar mensaje
-    let fecha = new Date;
-    const stringEntradaIV = "A" + fecha.getMonth() + idConversacion + "L" + fecha.getFullYear() + "E";
+    const stringEntradaIV = "P" + idConversacion + "Q" + "C";
     return cifrarConAES(mensajeTextoPlano, stringEntradaIV, claveSimetrica);
 }
 

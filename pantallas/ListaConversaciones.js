@@ -10,8 +10,6 @@ import { createSelector } from '@reduxjs/toolkit';
 
 import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
 
-import CryptoES from 'crypto-es';
-
 const ListaConversaciones = props => {
     //Contiene el id de usuario seleccionado si es que existe, si no: undefined
     const usuarioSeleccionado = props.route?.params?.idUsuarioSeleccionado;
@@ -77,7 +75,7 @@ const ListaConversaciones = props => {
             title="Ver clave guardada"
             onPress={async() => {
                 console.log(await ReactNativeAsyncStorage.getAllKeys());
-                console.log(await ReactNativeAsyncStorage.removeItem("datosUsuario"));
+                //console.log(await ReactNativeAsyncStorage.removeItem("smk-NikJxDk3e2TiVY-cOvj"));
                 //console.log(await ReactNativeAsyncStorage.getAllKeys());
             }}
         />
