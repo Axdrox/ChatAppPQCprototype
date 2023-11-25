@@ -3,7 +3,13 @@
 # dependencies
 !node_modules
 node_modules/*
+#Guardar los ajustes de kyber
 !node_modules/crystals-kyber/
+#Guardar los ajustes del archivo pbkdf2 de crypto-es
+!node_modules/crypto-es/
+node_modules/crypto-es/*
+!node_modules/crypto-es/lib
+node_modules/crypto-es/lib/*
 !node_modules/crypto-es/lib/pbkdf2.js
 
 # Expo
