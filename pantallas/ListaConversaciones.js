@@ -45,7 +45,7 @@ const ListaConversaciones = props => {
                         iconName='comment-search-outline'
                         //iconSize={20}
                         onPress={() => props.navigation.navigate("NuevaConversacion")}
-                        style={{ marginRight: 10 }} />
+                        style={{ marginRight: 10, marginTop: 35 }} />
                 </HeaderButtons>
             }
         })

@@ -3,7 +3,7 @@ import { app } from '../firebaseHelper';
 import { cifrarConAES, desencapsularKyber, encapsularKyber, generarClaveSimetrica, generarClavesKyber } from "./criptografia";
 import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
 
-const almacenarDatos = async (prefix, key, value) => {
+const almacenarValor = async (prefix, key, value) => {
     try {
         await ReactNativeAsyncStorage.setItem(prefix + key, value);
     } catch (e) {
@@ -22,7 +22,7 @@ const obtenerValor = async (prefix, key) => {
     console.log('Se obtuvieron los datos correctamente.')
 }
 
-const removerDatos = async (prefix, key) => {
+const removerValor = async (prefix, key) => {
     try {
         await ReactNativeAsyncStorage.removeItem(prefix + key)
     } catch (e) {
@@ -50,7 +50,7 @@ export const crearConversacion = async (idUsuarioQueInicioSesion, datosConversac
     //Llamando el algoritmo de generacion de claves de Kyber
     const clavesKyber = generarClavesKyber();
     //Guardando clave secreta de Kyber
-    almacenarDatos("sk", nuevaConversacion.key, clavesKyber[1]);
+    almacenarValor("sk", nuevaConversacion.key, clavesKyber[1]);
     const datosClavePublicaKyber = {
         creadoPor: idUsuarioQueInicioSesion,
         KyberClavePublica: clavesKyber[0],
@@ -132,7 +132,7 @@ const encapsular = async (referenciaBaseDatos, idConversacion, mensajeTextoPlano
     const stringEntradaSal = "P" + snapshotKyberClavePublica.val().creadoPor + "q" + "C";
     const claveSimetrica = generarClaveSimetrica(stringEntradaSal, clavesKyber[1]);
     //console.log("CLAVE SIMETRICA ENCAPSULADO: " + claveSimetrica);
-    await almacenarDatos("smk", idConversacion, claveSimetrica);
+    await almacenarValor("smk", idConversacion, claveSimetrica);
 
     return cifrarMensaje(mensajeTextoPlano, claveSimetrica, idConversacion);
 }
@@ -156,9 +156,9 @@ const desencapsular = async (referenciaBaseDatos, idConversacion, mensajeTextoPl
     //console.log("CLAVE SIMETRICA DESENCAPSULADO: " + claveSimetrica);
 
     //Removiendo la clave secreta de async storage
-    await removerDatos("sk", idConversacion);
+    await removerValor("sk", idConversacion);
     //Almacenando la clave simetrica
-    await almacenarDatos("smk", idConversacion, claveSimetrica);
+    await almacenarValor("smk", idConversacion, claveSimetrica);
 
     return cifrarMensaje(mensajeTextoPlano, claveSimetrica, idConversacion);
 }

@@ -23,7 +23,7 @@ const Conversacion = props => {
     const usuariosAlmacenados = useSelector(state => state.usuarios.usuariosAlmacenados);
     const conversacionesAlmacenadas = useSelector(state => state.conversaciones.datosConversacion);
 
-    // PODRIA OCUPARSE CRIPTOGRAFIA PARA DESCIFRAR MENSAJES
+    // Se reciben los mensajes descifrados de SliceMensajes, entonces se procesa para presentarlos
     const selectMensajesConversacion = createSelector(
         state => state.mensajes.datosMensajes[idConversacion],
         (datosDelMensajeDeConversacion) => {
@@ -32,8 +32,6 @@ const Conversacion = props => {
                 //console.log(datosDelMensajeDeConversacion[key].mensajeTexto);
                 const mensaje = datosDelMensajeDeConversacion[key];
                 mensaje.key = key;
-                //console.log(mensaje);
-                //GUARDAR LOS MENSAJES DESCIFRADOS!!!!
                 listaMensajes.push(mensaje);
             }
             return listaMensajes;

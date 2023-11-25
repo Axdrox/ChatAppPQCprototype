@@ -72,8 +72,8 @@ const FormularioRegistro = props => {
             setCargando(true);
             const accion = registrar(
                 formState.valoresEntrada.nombreUsuario,
-                formState.valoresEntrada.nombre,
-                formState.valoresEntrada.apellido,
+                formState.valoresEntrada.nombre.trim(),
+                formState.valoresEntrada.apellido.trim(),
                 formState.valoresEntrada.correo,
                 formState.valoresEntrada.contrasenia
             );

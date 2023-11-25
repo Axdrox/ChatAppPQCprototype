@@ -6,7 +6,8 @@ export const validarCadena = (id, valor) => {
     };
     if (valor !== "") {
         restricciones.format = {
-            pattern: "[a-z' ']+",
+            //Permitir tildes o dieresis
+            pattern: "[a-z' 'A-ZÀ-ÿ\u00f1\u00d1]+(\s*[a-zA-ZÀ-ÿ\u00f1\u00d1]*)*[a-z' 'A-ZÀ-ÿ\u00f1\u00d1]+",
             flags: "i",
             message: ": únicamente puede contener letras."
         }
