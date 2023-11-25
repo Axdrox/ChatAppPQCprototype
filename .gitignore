@@ -4,10 +4,7 @@
 !node_modules
 node_modules/*
 !node_modules/crystals-kyber/
-
-!node_modules
-node_modules/crypto-es/lib/*
-!node_modules/crypto-es/lib/
+!node_modules/crypto-es/lib/pbkdf2.js
 
 # Expo
 .expo/
