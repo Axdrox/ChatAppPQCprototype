@@ -7,7 +7,7 @@ node_modules/*
 
 !node_modules
 node_modules/crypto-es/lib/*
-!node_modules/crypto-es/lib/pbkdf2.js
+!node_modules/crypto-es/lib/
 
 # Expo
 .expo/
