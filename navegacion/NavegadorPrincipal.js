@@ -21,6 +21,8 @@ import colores from "../constantes/colores";
 import estilos from "../constantes/estilos";
 import { setUsuariosAlmacenados } from "../store/sliceUsuario";
 import { setMensajesConversacion } from "../store/sliceMensajes";
+import { KeyboardAvoidingView } from "react-native";
+import { Platform } from "react-native";
 
 
 const obtenerValor = async (prefix, key) => {
@@ -182,7 +184,11 @@ const NavegadorPrincipal = props => {
 
 
     return (
-        <NavegadorStack />
+        <KeyboardAvoidingView
+            style={{ flex: 1 }}
+            behavior={Platform.OS === "ios" ? "padding" : undefined}>
+            <NavegadorStack />
+        </KeyboardAvoidingView>
     );
 };
 

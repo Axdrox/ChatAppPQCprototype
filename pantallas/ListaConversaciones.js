@@ -58,19 +58,31 @@ const ListaConversaciones = props => {
         if (!usuarioSeleccionado) {
             return;
         }
-        //                El idUsuario de seleccionado, nuestro id
+        //El idUsuario de seleccionado, nuestro id
         const listaUsuarios = [usuarioSeleccionado, datosUsuario.idUsuario];
 
-        const propsNavegacion = {
-            newDatosConversacion: { usuarios: listaUsuarios }
+        let datosConversacion;
+        let propsNavegacion;
+        // Para obtener (si existen) los datos de conversacion, en vez de crear una nueva conversacion, abrir la que se tiene
+        if (usuarioSeleccionado) {
+            datosConversacion = conversacionesDelUsuario.find(dc => dc.usuarios.includes(usuarioSeleccionado))
         }
-
+        // Si encuentra datos de una conversacion, es decir, si existe esa conversacion
+        if (datosConversacion) {
+            propsNavegacion = { idConversacion: datosConversacion.key }
+        }
+        // No encuentra datos de conversacion existentes, por lo que se crea una nueva conversacion
+        else {
+            propsNavegacion = {
+                newDatosConversacion: { usuarios: listaUsuarios }
+            }
+        }
         props.navigation.navigate("Conversacion", propsNavegacion)
     }, [props.route?.params]);
 
     return <ContenedorPagina>
         <TituloPagina texto="Conversaciones" />
-        <Button
+        {/* <Button
             //TEST KYBER 
             title="Ver clave guardada"
             onPress={async() => {
@@ -78,7 +90,7 @@ const ListaConversaciones = props => {
                 //console.log(await ReactNativeAsyncStorage.removeItem("smk-NikJxDk3e2TiVY-cOvj"));
                 //console.log(await ReactNativeAsyncStorage.getAllKeys());
             }}
-        />
+        /> */}
         <FlatList
             data={conversacionesDelUsuario}
             renderItem={(itemData) => {
