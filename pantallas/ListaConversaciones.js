@@ -82,13 +82,24 @@ const ListaConversaciones = props => {
 
     return <ContenedorPagina>
         <TituloPagina texto="Conversaciones" />
-        {/* <Button
-            //TEST KYBER 
-            title="Ver clave guardada"
+         {/* <Button
+            title="Ver claves guardadas"
             onPress={async() => {
                 console.log(await ReactNativeAsyncStorage.getAllKeys());
-                //console.log(await ReactNativeAsyncStorage.removeItem("smk-NikJxDk3e2TiVY-cOvj"));
-                //console.log(await ReactNativeAsyncStorage.getAllKeys());
+            }}
+        />
+        <Button
+            title="Ver contenido de clave"
+            color={"green"}
+            onPress={async() => {
+                console.log(await ReactNativeAsyncStorage.getItem("llaveDeClave"));
+            }}
+        />
+        <Button
+            title="Eliminar clave"
+            color={"red"}
+            onPress={async() => {
+                console.log(await ReactNativeAsyncStorage.removeItem("llaveDeClave"));
             }}
         /> */}
         <FlatList
