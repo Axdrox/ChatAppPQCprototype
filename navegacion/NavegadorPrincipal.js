@@ -157,8 +157,12 @@ const NavegadorPrincipal = props => {
 
                 onValue(referenciaMensajes, async snapshotMensajes => {
                     const datosMensajes = snapshotMensajes.val();
+
+                    //Ver los datos de los mensajes recibidos de Firebase Realtime database
+                    //console.log(JSON.stringify(datosMensajes, undefined, 4));
+                    
                     const claveSimetrica = await obtenerValor("smk", idConversacion);
-                    dispatch(setMensajesConversacion({ idConversacion, datosMensajes, claveSimetrica }));
+                    dispatch(setMensajesConversacion({ idConversacion, datosMensajes, claveSimetrica }));           
                 })
 
                 if (contadorDeConversacionesEncontradas == 0) {

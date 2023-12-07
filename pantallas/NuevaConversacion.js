@@ -38,7 +38,7 @@ const NuevaConversacion = props => {
                         onPress={() => props.navigation.goBack()} />
                 </HeaderButtons>
             },
-            headerTitle: "Nueva conversación",
+            headerTitle: "Buscar usuario",
         })
     }, []);
 

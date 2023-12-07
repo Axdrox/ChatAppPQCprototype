@@ -23,13 +23,12 @@ const Conversacion = props => {
     const usuariosAlmacenados = useSelector(state => state.usuarios.usuariosAlmacenados);
     const conversacionesAlmacenadas = useSelector(state => state.conversaciones.datosConversacion);
 
-    // Se reciben los mensajes descifrados de SliceMensajes, entonces se procesa para presentarlos
+    // Se reciben los mensajes descifrados de sliceMensajes, entonces se procesa para presentarlos
     const selectMensajesConversacion = createSelector(
         state => state.mensajes.datosMensajes[idConversacion],
         (datosDelMensajeDeConversacion) => {
             const listaMensajes = [];
             for (const key in datosDelMensajeDeConversacion) {
-                //console.log(datosDelMensajeDeConversacion[key].mensajeTexto);
                 const mensaje = datosDelMensajeDeConversacion[key];
                 mensaje.key = key;
                 listaMensajes.push(mensaje);
@@ -39,6 +38,8 @@ const Conversacion = props => {
     );
 
     const mensajesConversacion = useSelector(selectMensajesConversacion);
+    //Ver los mensajes que proporciona sliceMensajes
+    //console.log(JSON.stringify(mensajesConversacion, undefined, 4));
 
     // Para que el primer mensaje que se envíe sea una invitación a conversar
     if (mensajesConversacion.length === 0 && mensajeTexto === "") {

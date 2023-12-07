@@ -66,12 +66,14 @@ export const autorizarAcceso = (correo, contrasenia) => {
             const { uid, stsTokenManager } = resultado.user;
             const { accessToken, expirationTime } = stsTokenManager;
 
+            //console.log("Identificador de usuario: " + uid + "\nToken de acceso: " + accessToken);
+
             const fechaExpiracionToken = new Date(expirationTime);
             const tiempoActual = new Date();
             const milisegundosHastaExpiracion = fechaExpiracionToken - tiempoActual;
 
             const datosUsuario = await obtenerDatosUsuario(uid);
-            //console.log(datosUsuario);
+            //console.log(JSON.stringify(datosUsuario, undefined, 4));
 
             // Actualizando el estado
             dispatch(autenticar({ token: accessToken, datosUsuario }));

@@ -129,9 +129,8 @@ const encapsular = async (referenciaBaseDatos, idConversacion, mensajeTextoPlano
     });
 
     //Generando clave simetrica
-    const stringEntradaSal = "P" + snapshotKyberClavePublica.val().creadoPor + "q" + "C";
+    const stringEntradaSal = "P" + snapshotKyberClavePublica.val().creadoPor + "q" + "C" + idConversacion;
     const claveSimetrica = generarClaveSimetrica(stringEntradaSal, clavesKyber[1]);
-    //console.log("CLAVE SIMETRICA ENCAPSULADO: " + claveSimetrica);
     await almacenarValor("smk", idConversacion, claveSimetrica);
 
     return cifrarMensaje(mensajeTextoPlano, claveSimetrica, idConversacion);
@@ -151,9 +150,8 @@ const desencapsular = async (referenciaBaseDatos, idConversacion, mensajeTextoPl
     const claveCompartida = desencapsularKyber(kyberTextoCifrado, claveSecreta);
 
     //Generando clave simetrica
-    const stringEntradaSal = "P" + snapshotClavePublica.val().creadoPor + "q" + "C";
+    const stringEntradaSal = "P" + snapshotClavePublica.val().creadoPor + "q" + "C" + idConversacion;
     const claveSimetrica = generarClaveSimetrica(stringEntradaSal, claveCompartida);
-    //console.log("CLAVE SIMETRICA DESENCAPSULADO: " + claveSimetrica);
 
     //Removiendo la clave secreta de async storage
     await removerValor("sk", idConversacion);

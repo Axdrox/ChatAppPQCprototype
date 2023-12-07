@@ -32,7 +32,7 @@ const ListaConversaciones = props => {
     );
 
     const conversacionesDelUsuario = useSelector(selectConversacionesDelUsuario);
-    //console.log(conversacionesDelUsuario);
+    //console.log(JSON.stringify(conversacionesDelUsuario, undefined, 4));
 
     // Todo lo que actualiza los botones de navegacion de header
     // son efectos, por eso se utiliza
@@ -82,24 +82,26 @@ const ListaConversaciones = props => {
 
     return <ContenedorPagina>
         <TituloPagina texto="Conversaciones" />
-         {/* <Button
-            title="Ver claves guardadas"
-            onPress={async() => {
-                console.log(await ReactNativeAsyncStorage.getAllKeys());
+        {/*<Button
+            title="Ver llaves guardadas"
+            onPress={async () => {
+                console.log("Llaves almacenadas:");
+                console.log(JSON.stringify(await ReactNativeAsyncStorage.getAllKeys(), undefined, 4));
             }}
         />
         <Button
-            title="Ver contenido de clave"
+            title="Ver contenido de llave"
             color={"green"}
-            onPress={async() => {
-                console.log(await ReactNativeAsyncStorage.getItem("llaveDeClave"));
+            onPress={async () => {
+                console.log("Valor de llave:");
+                console.log(JSON.stringify(await ReactNativeAsyncStorage.getItem("datosUsuario"), undefined, 4));
             }}
         />
         <Button
-            title="Eliminar clave"
+            title="Eliminar llave"
             color={"red"}
             onPress={async() => {
-                console.log(await ReactNativeAsyncStorage.removeItem("llaveDeClave"));
+                await ReactNativeAsyncStorage.removeItem("smk-Nl0ZaFLRyzyPbhY2REE");
             }}
         /> */}
         <FlatList

@@ -57,15 +57,17 @@ export const generarClaveSimetrica = (entradaSal, claveCompartida) => {
     return key128Bits;
 }
 
-export const cifrarConAES = (textoClaro, entradaIV, claveSimetrica) => {
+export const cifrarConAES = (textoPlano, entradaIV, claveSimetrica) => {
     const wordsClaveSimetrica = CryptoES.enc.Base64.parse(claveSimetrica);
     const iv = CryptoES.MD5(entradaIV);
-    return CryptoES.AES.encrypt(textoClaro, wordsClaveSimetrica, { iv: iv, mode: CryptoES.mode.CTR }).ciphertext.toString(CryptoES.enc.Base64);
+    return CryptoES.AES.encrypt(textoPlano, wordsClaveSimetrica, { iv: iv, mode: CryptoES.mode.CTR }).ciphertext.toString(CryptoES.enc.Base64);
 }
 
 export const descifrarConAES = (textoCifrado, entradaIV, claveSimetrica) => {
     const wordsTextoCifrado = CryptoES.enc.Base64.parse(textoCifrado);
-    const iv = CryptoES.MD5(entradaIV);
     const wordsClaveSimetrica = CryptoES.enc.Base64.parse(claveSimetrica);
+
+    const iv = CryptoES.MD5(entradaIV);
+
     return CryptoES.AES.decrypt({ ciphertext: wordsTextoCifrado }, wordsClaveSimetrica, { iv: iv, mode: CryptoES.mode.CTR }).toString(CryptoES.enc.Utf8);
 }
