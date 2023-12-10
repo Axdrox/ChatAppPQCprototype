@@ -7,7 +7,7 @@ import CryptoES from 'crypto-es';
 
 export const generarClavesKyber = () => {
     // Para generar par de claves de Kyber: publica y secreta (pk, sk)
-    let pk_sk = kyber.KeyGen512();
+    let pk_sk = kyber.KeyGen768();
     let pk = pk_sk[0];
     let sk = pk_sk[1];
 
@@ -25,7 +25,7 @@ export const encapsularKyber = (pk) => {
     const pk_buffer = Buffer.from(pk, 'base64');
 
     // Genera una clave simetrica de 256 bits (clave compartida: ss) y un texto cifrado (c)
-    let c_ss = kyber.Encrypt512(pk_buffer);
+    let c_ss = kyber.Encrypt768(pk_buffer);
     let c = c_ss[0];
     let ss1 = c_ss[1];
 
@@ -42,7 +42,7 @@ export const desencapsularKyber = (c, sk) => {
     const sk_buffer = Buffer.from(sk, 'base64');
 
     // Para desencapsular y obtener la misma clave simetrica (clave compartida: ss)
-    let ss2 = kyber.Decrypt512(c_buffer, sk_buffer);
+    let ss2 = kyber.Decrypt768(c_buffer, sk_buffer);
 
     const ss2_base64 = Buffer.from(ss2).toString('base64');
 
