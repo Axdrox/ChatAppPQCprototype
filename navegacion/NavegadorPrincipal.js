@@ -1,6 +1,9 @@
-import React, { useEffect, useState } from "react";
+import * as Device from 'expo-device';
+import * as Notifications from 'expo-notifications';
+import React, { useEffect, useRef, useState } from "react";
 //import { createStackNavigator } from '@react-navigation/stack'; //StackAPI
 import { createNativeStackNavigator } from '@react-navigation/native-stack'; //Stack-NATIVE-API
+import { StackActions, useNavigation } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 //import Ionicons from '@expo/vector-icons/Ionicons'
 import { Entypo } from '@expo/vector-icons';
@@ -85,9 +88,10 @@ const NavegadorStack = () => {
     )
 }
 
-const NavegadorPrincipal = props => {
+const NavegadorPrincipal = (props) => {
     // Para despachar sliceConversacion
     const dispatch = useDispatch();
+    const navegacion = useNavigation();
 
     // Ya que cuando cargue este componente tiene que estar activo en lo que termina de mostrar la informacion
     const [cargando, setCargando] = useState(true);
@@ -95,9 +99,43 @@ const NavegadorPrincipal = props => {
     const datosUsuario = useSelector(state => state.autenticacion.datosUsuario);
     const usuariosAlmacenados = useSelector(state => state.usuarios.usuariosAlmacenados);
 
+    // Variables de estado para notificaciones
+    const [expoPushToken, setExpoPushToken] = useState('');
+    //console.log(expoPushToken);
+    const notificationListener = useRef();
+    const responseListener = useRef();
+
+    useEffect(() => {
+        registerForPushNotificationsAsync().then(token => setExpoPushToken(token));
+
+        notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
+            // Tratar las notificacioes recibidas
+        });
+
+        responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
+            //console.log("Notificación seleccionada");
+            //console.log(response);
+            const { data } = response.notification.request.content;
+            const idConversacion = data["idConversacion"];
+
+            if (idConversacion) {
+                const accionPush = StackActions.push("Conversacion", { idConversacion });
+                navegacion.dispatch(accionPush);
+            }
+            else {
+                console.log("No se envió el id de la conversación a través de la notificación");
+            }
+        });
+
+        return () => {
+            Notifications.removeNotificationSubscription(notificationListener.current);
+            Notifications.removeNotificationSubscription(responseListener.current);
+        };
+    }, []);
+
     //Obteniendo los chats de usuario en Firebase
     useEffect(() => {
-        console.log("Suscribiendo listeners en Firebase");
+        //console.log("Suscribiendo listeners en Firebase");
         const referenciaBaseDatos = ref(getDatabase(app));
         const referenciaUsuarios = child(referenciaBaseDatos, `conversacionesUsuario/${datosUsuario.idUsuario}`);
         // Para controlar todos los listeners que se tengan
@@ -160,9 +198,9 @@ const NavegadorPrincipal = props => {
 
                     //Ver los datos de los mensajes recibidos de Firebase Realtime database
                     //console.log(JSON.stringify(datosMensajes, undefined, 4));
-                    
+
                     const claveSimetrica = await obtenerValor("smk", idConversacion);
-                    dispatch(setMensajesConversacion({ idConversacion, datosMensajes, claveSimetrica }));           
+                    dispatch(setMensajesConversacion({ idConversacion, datosMensajes, claveSimetrica }));
                 })
 
                 if (contadorDeConversacionesEncontradas == 0) {
@@ -174,7 +212,7 @@ const NavegadorPrincipal = props => {
         // Se ejecuta cuando la funcion useEffect va a terminar, de manera que se cierran los listeners
         // se puede probar cerrando sesion
         return () => {
-            console.log("Cerrando listeners de Firebase");
+            //console.log("Cerrando listeners de Firebase");
             referencias.forEach(ref => off(ref));
         }
     }, []);
@@ -197,3 +235,36 @@ const NavegadorPrincipal = props => {
 };
 
 export default NavegadorPrincipal;
+
+async function registerForPushNotificationsAsync() {
+    let token;
+
+    if (Platform.OS === 'android') {
+        await Notifications.setNotificationChannelAsync('default', {
+            name: 'default',
+            importance: Notifications.AndroidImportance.MAX,
+            vibrationPattern: [0, 250, 250, 250],
+            lightColor: '#FF231F7C',
+        });
+    }
+
+    if (Device.isDevice) {
+        const { status: existingStatus } = await Notifications.getPermissionsAsync();
+        let finalStatus = existingStatus;
+        if (existingStatus !== 'granted') {
+            const { status } = await Notifications.requestPermissionsAsync();
+            finalStatus = status;
+        }
+        if (finalStatus !== 'granted') {
+            alert('Fallo en obtener el token para notificaciones push :(');
+            return;
+        }
+        // Learn more about projectId:
+        // https://docs.expo.dev/push-notifications/push-notifications-setup/#configure-projectid
+        token = (await Notifications.getExpoPushTokenAsync({ projectId: 'c6f1b38a-0eee-424d-924e-7c846bf3b37b' })).data;
+    } else {
+        console.log('Se requiere utilizar un dispositivo físico para utilizar notificaciones push.');
+    }
+
+    return token;
+}

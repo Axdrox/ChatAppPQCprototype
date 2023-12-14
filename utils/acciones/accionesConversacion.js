@@ -2,6 +2,7 @@ import { child, get, getDatabase, push, ref, set, update } from "firebase/databa
 import { app } from '../firebaseHelper';
 import { cifrarConAES, desencapsularKyber, encapsularKyber, generarClaveSimetrica, generarClavesKyber } from "./criptografia";
 import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
+import { obtenerTokensPushUsuarios } from "./autenticacion";
 
 const almacenarValor = async (prefix, key, value) => {
     try {
@@ -32,12 +33,12 @@ const removerValor = async (prefix, key) => {
 }
 
 // AQUI SE PUEDE UTILIZAR CRIPTOGRAFIA PARA LA PARTE DE SUBIR LA CLAVE PUBLICA DE KYBER
-export const crearConversacion = async (idUsuarioQueInicioSesion, datosConversacion) => {
+export const crearConversacion = async (datosEmisor, datosConversacion) => {
     const newDatosConversacion = {
         ...datosConversacion,
         //SE PODRIAN QUITAR
         //creadoPor: idUsuarioQueInicioSesion,
-        actualizadoPor: idUsuarioQueInicioSesion,
+        actualizadoPor: datosEmisor.idUsuario,
         //creadoEn: new Date().toISOString(),
         actualizadoEn: new Date().toISOString()
     };
@@ -52,7 +53,7 @@ export const crearConversacion = async (idUsuarioQueInicioSesion, datosConversac
     //Guardando clave secreta de Kyber
     almacenarValor("sk", nuevaConversacion.key, clavesKyber[1]);
     const datosClavePublicaKyber = {
-        creadoPor: idUsuarioQueInicioSesion,
+        creadoPor: datosEmisor.idUsuario,
         KyberClavePublica: clavesKyber[0],
         KyberTextoCifrado: ""
     }
@@ -67,11 +68,16 @@ export const crearConversacion = async (idUsuarioQueInicioSesion, datosConversac
         //id de la conversacion que se encuentra en el nodo conversaciones
         await push(child(referenciaBaseDatos, `conversacionesUsuario/${idUsuario}`), nuevaConversacion.key);
     }
+
+    // Enviar notificacion push sin que sea al mismo usuario
+    const otrosUsuarios = usuariosDeLaConversacion.filter(uid => uid !== datosEmisor.idUsuario);
+    await enviarNotificacionPushParaUsuarios(otrosUsuarios, `${datosEmisor.nombre} ${datosEmisor.apellido}`, nuevaConversacion);
+
     return nuevaConversacion.key;
 }
 
 // PARA CIFRAR EL MENSAJE
-export const enviarMensajeTexto = async (idConversacion, idEmisor, mensaje, ejecutarEncapsular, ejecutarDesencapsular, peticionConversar) => {
+export const enviarMensajeTexto = async (idConversacion, datosEmisor, mensaje, ejecutarEncapsular, ejecutarDesencapsular, peticionConversar, usuariosDeLaConversacion) => {
     const referenciaBaseDatos = ref(getDatabase(app));
     //La referencia del nodo "mensajes" como se creara en la base de datos
     const referenciaMensajes = child(referenciaBaseDatos, `mensajes/${idConversacion}`);
@@ -91,13 +97,13 @@ export const enviarMensajeTexto = async (idConversacion, idEmisor, mensaje, ejec
 
     if (ejecutarEncapsular === false && ejecutarDesencapsular === false && peticionConversar === true) {
         datosMensaje = {
-            enviadoPor: idEmisor,
+            enviadoPor: datosEmisor.idUsuario,
             //Primer mensaje en claro
             mensajeTexto: mensaje
         };
     } else {
         datosMensaje = {
-            enviadoPor: idEmisor,
+            enviadoPor: datosEmisor.idUsuario,
             //Mensaje cifrado
             mensajeTexto: mensajeCifrado
         };
@@ -108,9 +114,13 @@ export const enviarMensajeTexto = async (idConversacion, idEmisor, mensaje, ejec
     // Actualizar la conversacion para ordenar la lista de conversaciones
     const referenciaConversacion = child(referenciaBaseDatos, `conversaciones/${idConversacion}`);
     await update(referenciaConversacion, {
-        actualizadoPor: idEmisor,
+        actualizadoPor: datosEmisor.idUsuario,
         actualizadoEn: new Date().toISOString(),
     });
+
+    // Enviar notificacion push sin que sea al mismo usuario
+    const otrosUsuarios = usuariosDeLaConversacion.filter(uid => uid !== datosEmisor.idUsuario);
+    await enviarNotificacionPushParaUsuarios(otrosUsuarios, `${datosEmisor.nombre} ${datosEmisor.apellido}`, idConversacion);
 }
 
 const encapsular = async (referenciaBaseDatos, idConversacion, mensajeTextoPlano) => {
@@ -171,3 +181,26 @@ const cifrarMensaje = (mensajeTextoPlano, claveSimetrica, idConversacion) => {
 const delay = ms => new Promise(
     resolve => setTimeout(resolve, ms)
 );
+
+const enviarNotificacionPushParaUsuarios = (usuariosDeLaConversacion, nombreUsuario, idConversacion) => {
+    usuariosDeLaConversacion.forEach(async uid => {
+        // Obtener el arreglo de identificadores de usuarios de la conversacion
+        const tokens = await obtenerTokensPushUsuarios(uid);
+        for (const key in tokens) {
+            const token = tokens[key];
+
+            await fetch('https://exp.host/--/api/v2/push/send', {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    to: token,
+                    title: nombreUsuario,
+                    body: "¡Nuevo mensaje!",
+                    data: { idConversacion }
+                })
+            })
+        }
+    });
+}

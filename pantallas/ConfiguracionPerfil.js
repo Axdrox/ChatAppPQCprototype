@@ -165,7 +165,7 @@ const ConfiguracionPerfil = props => {
 
                     <BotonEnviar
                         title='Cerrar sesión'
-                        onPress={() => dispatch(terminarSesion())}
+                        onPress={() => dispatch(terminarSesion(datosUsuario))}
                         style={{ marginTop: 25 }}
                         color={colores.rojoMorado} />
 

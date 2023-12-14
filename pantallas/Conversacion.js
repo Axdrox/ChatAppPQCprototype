@@ -85,28 +85,28 @@ const Conversacion = props => {
                 // Si no existe un id de conversacion (la conversacion es nueva)
                 // se crea la conversacion a partir del primer mensaje enviado
                 // NOTA: SE PUBLICA LA CLAVE PUBLICA DE KYBER DE QUIEN CREA LA CONVERSACION
-                id = await crearConversacion(datosUsuario.idUsuario, props.route.params.newDatosConversacion);
+                id = await crearConversacion(datosUsuario, props.route.params.newDatosConversacion);
                 setIdConversacion(id);
             }
             //Invitacion para conversar
             if (mensajesConversacion.length === 0) {
-                await enviarMensajeTexto(id, datosUsuario.idUsuario, mensajeTexto, false, false, true);
+                await enviarMensajeTexto(id, datosUsuario, mensajeTexto, false, false, true, conversacionUsuarios);
             }
             //Para ejecutar el algoritmo de encapsulado (Usuario que no crea la conversacion/que no envia el primer mensaje)
             else if (mensajesConversacion.length === 1 && datosUsuario.idUsuario !== idUsuarioPrimerMensaje) {
-                await enviarMensajeTexto(id, datosUsuario.idUsuario, mensajeTexto, true, false, false);
+                await enviarMensajeTexto(id, datosUsuario, mensajeTexto, true, false, false, conversacionUsuarios);
             }
             //Para que siga cifrando el usuario que ya encapsulo y genero su clave simetrica
             else if (mensajesConversacion.length > 1 && datosUsuario.idUsuario !== idUsuarioPrimerMensaje) {
-                await enviarMensajeTexto(id, datosUsuario.idUsuario, mensajeTexto, false, false, false);
+                await enviarMensajeTexto(id, datosUsuario, mensajeTexto, false, false, false, conversacionUsuarios);
             }
             //Para ejecutar el algoritmo de desencapsulacion (Usuario que genera las claves de Kyber/inicia la conversación)
             else if (mensajesEnviadosPrimerUsuario === 1 && datosUsuario.idUsuario === idUsuarioPrimerMensaje) {
-                await enviarMensajeTexto(id, datosUsuario.idUsuario, mensajeTexto, false, true, false);
+                await enviarMensajeTexto(id, datosUsuario, mensajeTexto, false, true, false, conversacionUsuarios);
             }
             //Para que siga cifrando el usuario que ya desencapsulo y genero su clave simetrica
             else if (mensajesEnviadosPrimerUsuario > 1 && datosUsuario.idUsuario === idUsuarioPrimerMensaje) {
-                await enviarMensajeTexto(id, datosUsuario.idUsuario, mensajeTexto, false, false, false);
+                await enviarMensajeTexto(id, datosUsuario, mensajeTexto, false, false, false, conversacionUsuarios);
             }
             setMensajeTexto("");
         } catch (error) {
